@@ -2,50 +2,61 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Akıllı Web TV · Test 0.6</title>
+<title>SefaXTV · Test 0.7</title>
 <style>
 :root{font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif;color-scheme:dark;background:#0b1020;color:#f6f8fe}
 *{box-sizing:border-box}body{margin:0}main{max-width:1160px;margin:auto;padding:24px}
 header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:22px}h1{font-size:clamp(21px,3vw,30px);margin:0;letter-spacing:-.7px}header small{color:#96a4c2}
-.layout{display:grid;grid-template-columns:225px minmax(0,1fr);gap:18px}nav{display:flex;flex-direction:column;gap:9px}button{font:inherit;cursor:pointer}
+.layout{display:grid;grid-template-columns:255px minmax(0,1fr);gap:18px}.side{min-width:0;display:flex;flex-direction:column;gap:11px}.side input[type=search],.side select{width:100%;padding:11px 12px;background:#17213a;color:#f6f8fe;border:1px solid #33435f;border-radius:9px;font:inherit}.side input:focus-visible,.side select:focus-visible{outline:2px solid #61a9ff}.filter-row{display:flex;align-items:center;gap:7px;font-size:13px;color:#b6c5df}.filter-row input{accent-color:#64affb}.channel-note{font-size:12px;color:#9dacc8}.entry{display:flex;gap:6px;align-items:stretch}nav{display:flex;flex-direction:column;gap:9px;min-width:0}.entry>button:first-child{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}.entry>.fav{width:39px;flex:0 0 39px;text-align:center;padding:8px 0;color:#b7c3d9}.entry>.fav[aria-pressed=true]{color:#ffc862;border-color:#cf9d39;background:#382b18}.empty-list{color:#afbad0;font-size:13px;padding:10px}button{font:inherit;cursor:pointer}
 nav button{background:#17213a;color:#d8e4f8;border:1px solid #2b3854;border-radius:12px;padding:14px 13px;text-align:left}nav button:hover,nav button:focus-visible{border-color:#61a9ff;outline:2px solid transparent}nav button.active{background:#214b7a;color:#fff;border-color:#5ba6f8}
 .tv{position:relative;background:#030711;border:1px solid #29344d;border-radius:13px;overflow:hidden;aspect-ratio:16/9}.tv iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}
 .cover{position:absolute;inset:0;background:linear-gradient(140deg,#0d1429,#121e35);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;padding:20px;z-index:2}.cover[hidden]{display:none}.symbol{font-size:40px;line-height:1;color:#6eb6ff}.cover strong{font-size:clamp(17px,2vw,24px)}.cover span{font-size:13px;color:#aebad2}
 .caption{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-top:12px;color:#bac8e2;font-size:13px}.label{background:#17243d;border:1px solid #2c4162;border-radius:99px;padding:5px 10px;white-space:nowrap}
 .tools{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-top:16px}.tools button{background:#214b7a;color:#fff;border:1px solid #5ba6f8;border-radius:9px;padding:9px 14px}.tools button:disabled{opacity:.55;cursor:wait}.tools small{color:#a6b6d0}
 .lab{color:#8290ae;font-size:12px;margin-top:15px;line-height:1.55}.lab summary{cursor:pointer;width:max-content}.lab button{background:#17213a;color:#d8e4f8;border:1px solid #2b3854;border-radius:7px;padding:7px 10px;margin-top:8px}.lab p{margin:7px 0}.settings{display:flex;gap:8px;flex-wrap:wrap;margin:7px 0}.settings input{flex:1;min-width:210px;border:1px solid #34476a;border-radius:8px;background:#0e1629;color:#f6f8fe;padding:8px 10px;font:inherit}.settings input:focus-visible{outline:2px solid #61a9ff}.note{color:#7f91b5;font-size:12px;line-height:1.55;margin-top:12px}
-@media(max-width:730px){main{padding:14px}.layout{grid-template-columns:1fr}nav{flex-direction:row;overflow-x:auto}nav button{white-space:nowrap;flex:0 0 auto;padding:11px}.caption{flex-wrap:wrap}}
+@media(max-width:730px){main{padding:14px}.layout{grid-template-columns:1fr}.side{gap:8px}nav{flex-direction:row;overflow-x:auto}.entry{flex:0 0 auto}.entry>button:first-child{min-width:125px;max-width:195px;white-space:nowrap;padding:11px}.caption{flex-wrap:wrap}}
 </style></head><body>
 <main>
-<header><h1>Akıllı Web TV</h1><small>Tek dosya · Test 0.6</small></header>
-<div class="layout"><nav id="channels" aria-label="Test kanalları"></nav><div>
+<header><h1>SefaXTV</h1><small>Tek HTML · Test 0.7</small></header>
+<div class="layout"><aside class="side"><input id="search" type="search" placeholder="Kanal ara…" aria-label="Kanal ara" maxlength="120" autocomplete="off"><select id="category" aria-label="Kategori"><option value="">Tüm kategoriler</option></select><label class="filter-row"><input type="checkbox" id="onlyFavorites"> Yalnız favoriler</label><small class="channel-note" id="channelCount" role="status"></small><nav id="channels" aria-label="Test kanalları"></nav></aside><div>
 <section class="tv" id="screen" aria-label="TV ekranı"><div class="cover" id="cover" aria-live="polite"><div class="symbol">◉</div><strong id="coverTitle">Yayın hazırlanıyor</strong><span id="coverDetail">Oynatma doğrulanıyor…</span></div></section>
 <div class="caption"><span id="status" role="status">Başlatılıyor…</span><span class="label" id="badge">TEST</span></div>
 <div class="tools"><button id="update" type="button">↻ Güncelle</button><small id="updateStatus" role="status">Katalog hazırlanıyor…</small></div>
 <details class="lab"><summary>Test bilgisi</summary><p id="memory">Yerel hafıza kontrol ediliyor…</p><p id="diagnostic"></p><p id="sourceInfo"></p><p id="remoteInfo">GitHub Pages katalog adresi hazırlanıyor…</p><button type="button" id="demoUpdate">Yerel imzalı paket testi</button><button type="button" id="reset">Laboratuvar hafızasını sıfırla</button></details>
-<p class="note">Bu sürüm gerçek yayın içermez. Güncelle, GitHub Pages üzerinden imzalı katalog arar; site henüz açılmadıysa mevcut veriyi korur. Yerel imzalı deney ayrı düğmededir.</p>
+<p class="note">Bu sürüm gerçek yayın içermez. Kategori, arama ve favoriler yalnız cihazında çalışır. Güncelle, GitHub Pages üzerinden imzalı katalog alır; yönetici anahtarı veya yönetim aracı bu sayfada yoktur.</p>
 </div></div></main>
 <script>
 'use strict';
-// v0.6 — GitHub Pages statik yayın, imzalı internet kataloğu. v0.3 IndexedDB şeması korunur.
+// v0.7 — İmzalı yayın kataloğu + kategori/arama/favoriler. Yönetici aracı KAMUSAL sayfaya dahil edilmez.
 // Özel DunyaTV deposu herkese açık katalog değildir; dosyalar kamuya açık HTTPS statik sitede yayımlanmalıdır.
-const CLIENT_BUILD=6,MAX_SOURCES=20,MAX_ATTEMPTS=3,TIMEOUT_MS=6500,DB_NAME='akilli-web-tv-lab-v03';
+const CLIENT_BUILD=7,MAX_SOURCES=20,MAX_ATTEMPTS=3,TIMEOUT_MS=6500,DB_NAME='akilli-web-tv-lab-v03';
 const INITIAL={"schemaVersion":1,"version":1,"channels":[{"id":"video","name":"Canlı görüntü testi","sources":[{"id":"video-1","mode":"play","revision":1,"priority":1,"enabled":true}]},{"id":"yedek","name":"Otomatik yedek testi","sources":[{"id":"yedek-a","mode":"fail","revision":1,"priority":1,"enabled":true},{"id":"yedek-b","mode":"play","revision":1,"priority":2,"enabled":true},{"id":"yedek-yedek-3","mode":"ready","revision":1,"priority":3,"enabled":true},{"id":"yedek-yedek-4","mode":"ready","revision":1,"priority":4,"enabled":true},{"id":"yedek-yedek-5","mode":"ready","revision":1,"priority":5,"enabled":true},{"id":"yedek-yedek-6","mode":"ready","revision":1,"priority":6,"enabled":true},{"id":"yedek-yedek-7","mode":"ready","revision":1,"priority":7,"enabled":true},{"id":"yedek-yedek-8","mode":"ready","revision":1,"priority":8,"enabled":true},{"id":"yedek-yedek-9","mode":"ready","revision":1,"priority":9,"enabled":true},{"id":"yedek-yedek-10","mode":"ready","revision":1,"priority":10,"enabled":true},{"id":"yedek-yedek-11","mode":"ready","revision":1,"priority":11,"enabled":true},{"id":"yedek-yedek-12","mode":"ready","revision":1,"priority":12,"enabled":true},{"id":"yedek-yedek-13","mode":"ready","revision":1,"priority":13,"enabled":true},{"id":"yedek-yedek-14","mode":"ready","revision":1,"priority":14,"enabled":true},{"id":"yedek-yedek-15","mode":"ready","revision":1,"priority":15,"enabled":true},{"id":"yedek-yedek-16","mode":"ready","revision":1,"priority":16,"enabled":true},{"id":"yedek-yedek-17","mode":"ready","revision":1,"priority":17,"enabled":true},{"id":"yedek-yedek-18","mode":"ready","revision":1,"priority":18,"enabled":true},{"id":"yedek-yedek-19","mode":"ready","revision":1,"priority":19,"enabled":true},{"id":"yedek-yedek-20","mode":"ready","revision":1,"priority":20,"enabled":true}]},{"id":"kapak","name":"Kapak güvenlik testi","sources":[{"id":"kapak-1","mode":"ready","revision":1,"priority":1,"enabled":true}]}],"revokedPermissionIds":[]};
 const LAB_PUBLIC_KEY={"kty":"EC","crv":"P-256","x":"3TDgnlSWrom_1f_dxW89WoshOCom_CNpKNAzo3EyNCY","y":"KI5hmB8g5FBTFPc4KVC86T6DZExn0Vv2Uu8PfSwfxVQ","ext":true,"key_ops":["verify"]};
 const LAB_ENVELOPE={"keyId":"tv-lab-05","payload":"eyJzY2hlbWFWZXJzaW9uIjoxLCJ2ZXJzaW9uIjozLCJtaW5DbGllbnRCdWlsZCI6NSwicHVibGlzaGVkQXQiOiIyMDI2LTExLTIzVDIwOjAwOjAwWiIsImNhdGFsb2dTaGEyNTYiOiI2MTI4OTY3YzU4MzBjOTE4MTJjYzYwOGJhODFkNzNkODRjYjRjODgxMWIwOTM4OWEwNDk1MmM2NWM2MTg0NDI0In0","signature":"HVOqP4TymjolnILomB4RBexOUr1VQz3uY9PUoVzyN0tWrNM-VNycRaCUK8doey-1INieaAMmWXPKqBrZS-bcdA"};
 const LAB_CATALOG_TEXT="{\"schemaVersion\":1,\"version\":3,\"channels\":[{\"id\":\"video\",\"name\":\"Canlı görüntü testi\",\"sources\":[{\"id\":\"video-1\",\"mode\":\"play\",\"revision\":1,\"priority\":1,\"enabled\":true}]},{\"id\":\"yedek\",\"name\":\"Otomatik yedek testi\",\"sources\":[{\"id\":\"yedek-a\",\"mode\":\"fail\",\"revision\":1,\"priority\":1,\"enabled\":true},{\"id\":\"yedek-b\",\"mode\":\"play\",\"revision\":1,\"priority\":2,\"enabled\":true},{\"id\":\"yedek-yedek-3\",\"mode\":\"ready\",\"revision\":1,\"priority\":3,\"enabled\":true},{\"id\":\"yedek-yedek-4\",\"mode\":\"ready\",\"revision\":1,\"priority\":4,\"enabled\":true},{\"id\":\"yedek-yedek-5\",\"mode\":\"ready\",\"revision\":1,\"priority\":5,\"enabled\":true},{\"id\":\"yedek-yedek-6\",\"mode\":\"ready\",\"revision\":1,\"priority\":6,\"enabled\":true},{\"id\":\"yedek-yedek-7\",\"mode\":\"ready\",\"revision\":1,\"priority\":7,\"enabled\":true},{\"id\":\"yedek-yedek-8\",\"mode\":\"ready\",\"revision\":1,\"priority\":8,\"enabled\":true},{\"id\":\"yedek-yedek-9\",\"mode\":\"ready\",\"revision\":1,\"priority\":9,\"enabled\":true},{\"id\":\"yedek-yedek-10\",\"mode\":\"ready\",\"revision\":1,\"priority\":10,\"enabled\":true},{\"id\":\"yedek-yedek-11\",\"mode\":\"ready\",\"revision\":1,\"priority\":11,\"enabled\":true},{\"id\":\"yedek-yedek-12\",\"mode\":\"ready\",\"revision\":1,\"priority\":12,\"enabled\":true},{\"id\":\"yedek-yedek-13\",\"mode\":\"ready\",\"revision\":1,\"priority\":13,\"enabled\":true},{\"id\":\"yedek-yedek-14\",\"mode\":\"ready\",\"revision\":1,\"priority\":14,\"enabled\":true},{\"id\":\"yedek-yedek-15\",\"mode\":\"ready\",\"revision\":1,\"priority\":15,\"enabled\":true},{\"id\":\"yedek-yedek-16\",\"mode\":\"ready\",\"revision\":1,\"priority\":16,\"enabled\":true},{\"id\":\"yedek-yedek-17\",\"mode\":\"ready\",\"revision\":1,\"priority\":17,\"enabled\":true},{\"id\":\"yedek-yedek-18\",\"mode\":\"ready\",\"revision\":1,\"priority\":18,\"enabled\":true},{\"id\":\"yedek-yedek-19\",\"mode\":\"ready\",\"revision\":1,\"priority\":19,\"enabled\":true},{\"id\":\"yedek-yedek-20\",\"mode\":\"ready\",\"revision\":1,\"priority\":20,\"enabled\":true}]},{\"id\":\"kapak\",\"name\":\"Kapak güvenlik testi\",\"sources\":[{\"id\":\"kapak-1\",\"mode\":\"ready\",\"revision\":1,\"priority\":1,\"enabled\":true}]},{\"id\":\"ek-test\",\"name\":\"Güncellenen test kanalı\",\"sources\":[{\"id\":\"ek-test-1\",\"mode\":\"play\",\"revision\":1,\"priority\":1,\"enabled\":true}]},{\"id\":\"uzak-test\",\"name\":\"İnternetten gelen test kanalı\",\"sources\":[{\"id\":\"uzak-test-1\",\"mode\":\"play\",\"revision\":1,\"priority\":1,\"enabled\":true}]}],\"revokedPermissionIds\":[]}\n";
 const $=id=>document.getElementById(id),nav=$('channels'),screen=$('screen'),cover=$('cover');
-let db=null,durable=false,setupDone=false,catalog=INITIAL,memory=new Map(),active=null,serial=0,working=false;
+let db=null,durable=false,setupDone=false,catalog=INITIAL,memory=new Map(),active=null,serial=0,working=false,selectedChannelId=null,favorites=new Set();
 let state={id:'catalog',active:1,previous:null,highWater:1,hash:null};
+const IDENT=/^[a-z0-9][a-z0-9._-]{0,79}$/;
+function categoriesFor(v){return Array.isArray(v.categories)?v.categories:[{id:'test',name:'Test kanalları'}]}
+function channelCategories(ch){return Array.isArray(ch.categoryIds)?ch.categoryIds:['test']}
+function labMode(src){return src.provider==='lab'&&src.permissionId==='lab-internal'?src.contentId:(src.provider===undefined?src.mode:null)}
+function sourceAllowed(s){return !catalog.revokedPermissionIds?.includes(s.permissionId)&&['play','fail','ready'].includes(labMode(s))}
 function validateCatalog(v){
- if(!v||v.schemaVersion!==1||!Number.isSafeInteger(v.version)||v.version<1||!Array.isArray(v.channels)||v.channels.length>200||!Array.isArray(v.revokedPermissionIds)||v.revokedPermissionIds.length)return false;
- const chids=new Set(),srcids=new Set();
+ if(!v||v.schemaVersion!==1||!Number.isSafeInteger(v.version)||v.version<1||!Array.isArray(v.channels)||v.channels.length>200||!Array.isArray(v.revokedPermissionIds)||v.revokedPermissionIds.length>200||new Set(v.revokedPermissionIds).size!==v.revokedPermissionIds.length||v.revokedPermissionIds.some(id=>!IDENT.test(id)))return false;
+ const legacy=v.version<=3&&!('categories' in v);
+ if(!legacy&&(!Array.isArray(v.categories)||!v.categories.length||v.categories.length>100))return false;
+ const cats=categoriesFor(v),catIds=new Set(),chids=new Set(),srcids=new Set();
+ for(const cat of cats){if(!cat||typeof cat.id!=='string'||!IDENT.test(cat.id)||catIds.has(cat.id)||typeof cat.name!=='string'||!cat.name.trim()||cat.name.length>120)return false;catIds.add(cat.id)}
  for(const ch of v.channels){
-  if(!ch||!/^[-a-z0-9]{1,80}$/.test(ch.id)||typeof ch.name!=='string'||ch.name.length>120||chids.has(ch.id)||!Array.isArray(ch.sources)||ch.sources.length===0||ch.sources.length>MAX_SOURCES)return false;
+  if(!ch||typeof ch.id!=='string'||!IDENT.test(ch.id)||typeof ch.name!=='string'||!ch.name.trim()||ch.name.length>120||chids.has(ch.id)||!Array.isArray(ch.sources)||ch.sources.length>MAX_SOURCES)return false;
+  if(!legacy&&(!Array.isArray(ch.categoryIds)||!ch.categoryIds.length||new Set(ch.categoryIds).size!==ch.categoryIds.length||ch.categoryIds.some(id=>!catIds.has(id))||!(ch.logoSha256===null||typeof ch.logoSha256==='string'&&/^[a-f0-9]{64}$/.test(ch.logoSha256))))return false;
   chids.add(ch.id);
-  for(const s of ch.sources){
-   if(!s||!/^[-a-z0-9]{1,80}$/.test(s.id)||srcids.has(s.id)||!['play','fail','ready'].includes(s.mode)||!Number.isSafeInteger(s.revision)||s.revision<1||!Number.isInteger(s.priority)||s.priority<1||s.priority>20||typeof s.enabled!=='boolean')return false;
-   srcids.add(s.id);
+  for(const src of ch.sources){
+   if(!src||typeof src.id!=='string'||!IDENT.test(src.id)||srcids.has(src.id)||!Number.isSafeInteger(src.revision)||src.revision<1||!Number.isInteger(src.priority)||src.priority<1||src.priority>20||typeof src.enabled!=='boolean')return false;
+   if(legacy){if(!['play','fail','ready'].includes(src.mode))return false}
+   else if(src.provider!=='lab'||src.permissionId!=='lab-internal'||!['play','fail','ready'].includes(src.contentId)||Object.hasOwn(src,'mode'))return false; // LAB'da henüz gerçek sağlayıcı adaptörü bulunmaz.
+   srcids.add(src.id);
   }
  }
  return true;
@@ -54,8 +65,8 @@ if(!validateCatalog(INITIAL))throw Error('Başlangıç kataloğu geçersiz');
 function request(req){return new Promise((resolve,reject)=>{req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error||Error('IDB hatası'))})}
 function openDB(){return new Promise((resolve,reject)=>{
  if(!window.indexedDB){reject(Error('IndexedDB desteklenmiyor'));return}
- const req=indexedDB.open(DB_NAME,2);
- req.onupgradeneeded=()=>{const d=req.result;if(!d.objectStoreNames.contains('history'))d.createObjectStore('history',{keyPath:'key'});if(!d.objectStoreNames.contains('catalogs'))d.createObjectStore('catalogs',{keyPath:'version'});if(!d.objectStoreNames.contains('meta'))d.createObjectStore('meta',{keyPath:'id'})};
+ const req=indexedDB.open(DB_NAME,3);
+ req.onupgradeneeded=()=>{const d=req.result;if(!d.objectStoreNames.contains('history'))d.createObjectStore('history',{keyPath:'key'});if(!d.objectStoreNames.contains('catalogs'))d.createObjectStore('catalogs',{keyPath:'version'});if(!d.objectStoreNames.contains('meta'))d.createObjectStore('meta',{keyPath:'id'});if(!d.objectStoreNames.contains('profile'))d.createObjectStore('profile',{keyPath:'id'})};
  req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error||Error('Veritabanı açılamadı'));req.onblocked=()=>reject(Error('DB açık sekmede kilitli'));
 })}
 async function readStore(store,key){return request(db.transaction(store,'readonly').objectStore(store).get(key))}
@@ -77,6 +88,7 @@ async function loadData(){
  }
  const all=await new Promise((resolve,reject)=>{const req=db.transaction('history','readonly').objectStore('history').getAll();req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error)});
  memory=new Map(all.map(x=>[x.key,x]));
+ const profile=await readStore('profile','favorites');favorites=new Set(Array.isArray(profile?.ids)?profile.ids.filter(x=>typeof x==='string'&&IDENT.test(x)):[]);
 }
 function saveHistory(record){return new Promise((resolve,reject)=>{
  const tx=db.transaction('history','readwrite');tx.objectStore('history').put(record);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error||Error('Tarihçe yazılamadı'));
@@ -85,7 +97,7 @@ function recordKey(s){return `${s.id}:r${s.revision}:web-lab:adapter1`}
 function today(){const d=new Date();return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-')}
 function dayDelta(t){const a=new Date(t+'T12:00:00'),b=new Date(today()+'T12:00:00');return Math.max(0,Math.round((b-a)/86400000))}
 function reliability(s){const h=memory.get(recordKey(s));let S=0,F=0;if(h)for(const d of h.daily||[])if(dayDelta(d.date)<=90){const w=2**(-dayDelta(d.date)/14);S+=d.success*w;F+=d.failure*w}return(2+S)/(4+S+F)}
-function rank(sources){const now=Date.now();return sources.filter(s=>s.enabled).slice().sort((a,b)=>{
+function rank(sources){const now=Date.now();return sources.filter(s=>s.enabled&&sourceAllowed(s)).slice().sort((a,b)=>{
  const ah=memory.get(recordKey(a)),bh=memory.get(recordKey(b));const ac=(ah?.retryAfter||0)>now,bc=(bh?.retryAfter||0)>now;
  if(ac!==bc)return Number(ac)-Number(bc);
  return Math.floor(20*reliability(b))-Math.floor(20*reliability(a))||a.priority-b.priority||a.id.localeCompare(b.id)
@@ -107,10 +119,18 @@ function refreshInfo(){if(!setupDone)return;
  $('memory').textContent=durable?'IndexedDB etkin · 0.3 kaynak hafızası korunur.':'IndexedDB kapalı · Kalıcı kayıt kullanılamıyor.';
  const c=catalog.channels.find(x=>x.id==='yedek');const first=c?rank(c.sources)[0]:null;
  const successes=memory.get('yedek-b:r1:web-lab:adapter1')?.daily?.reduce((n,d)=>n+d.success,0)||0;
- $('diagnostic').textContent=`Katalog v${catalog.version} · ${catalog.channels.length} test kanalı · Yedek kaynağın doğrulanmış başarısı: ${successes}.`;
+ $('diagnostic').textContent=`Katalog v${catalog.version} · ${catalog.channels.length} test kanalı · ${favorites.size} favori · Yedek kaynağın doğrulanmış başarısı: ${successes}.`;
  $('sourceInfo').textContent=`Yedek testinde ilk aday: ${first?.id||'yok'}. Kanal başına en çok ${MAX_SOURCES} kaynak.`;
 }
-function renderChannels(selected){nav.replaceChildren();for(const c of catalog.channels){const b=document.createElement('button');b.type='button';b.textContent=c.name;b.dataset.id=c.id;b.classList.toggle('active',c.id===selected);b.setAttribute('aria-pressed',String(c.id===selected));b.addEventListener('click',()=>choose(c));nav.append(b)}}
+function storeFavorites(){if(!durable)return Promise.resolve();return new Promise((resolve,reject)=>{const tx=db.transaction('profile','readwrite');tx.objectStore('profile').put({id:'favorites',ids:[...favorites]});tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error||Error('Favori kaydı başarısız'))})}
+function drawCategoryOptions(){const selected=$('category').value;const select=$('category');select.replaceChildren();const all=document.createElement('option');all.value='';all.textContent='Tüm kategoriler';select.add(all);for(const cat of categoriesFor(catalog)){const opt=document.createElement('option');opt.value=cat.id;opt.textContent=cat.name;select.add(opt)}select.value=[...select.options].some(x=>x.value===selected)?selected:''}
+function renderChannels(selected){selectedChannelId=selected;drawCategoryOptions();nav.replaceChildren();const search=$('search').value.trim().toLocaleLowerCase('tr-TR'),category=$('category').value,onlyFav=$('onlyFavorites').checked;
+ const shown=catalog.channels.filter(c=>(!search||c.name.toLocaleLowerCase('tr-TR').includes(search))&&(!category||channelCategories(c).includes(category))&&(!onlyFav||favorites.has(c.id)));
+ for(const c of shown){const row=document.createElement('div');row.className='entry';const b=document.createElement('button');b.type='button';b.textContent=c.name;b.dataset.id=c.id;b.classList.toggle('active',c.id===selected);b.setAttribute('aria-pressed',String(c.id===selected));b.addEventListener('click',()=>choose(c));row.append(b);
+ const fav=document.createElement('button');fav.type='button';fav.className='fav';fav.textContent=favorites.has(c.id)?'★':'☆';fav.title=favorites.has(c.id)?'Favoriden çıkar':'Favorilere ekle';fav.setAttribute('aria-label',`${c.name}: ${fav.title}`);fav.setAttribute('aria-pressed',String(favorites.has(c.id)));fav.addEventListener('click',()=>{if(favorites.has(c.id))favorites.delete(c.id);else favorites.add(c.id);renderChannels(selectedChannelId);storeFavorites().catch(()=>{$('updateStatus').textContent='Favori kaydedilemedi · Bu oturum için etkin'})});row.append(fav);nav.append(row)}
+ if(!shown.length){const empty=document.createElement('span');empty.className='empty-list';empty.textContent='Eşleşen kanal yok';nav.append(empty)}$('channelCount').textContent=`${shown.length} / ${catalog.channels.length} test kanalı`;
+}
+$('search').addEventListener('input',()=>renderChannels(selectedChannelId));$('category').addEventListener('change',()=>renderChannels(selectedChannelId));$('onlyFavorites').addEventListener('change',()=>renderChannels(selectedChannelId));
 function showCover(title,detail='Oynatma doğrulanıyor…'){$('coverTitle').textContent=title;$('coverDetail').textContent=detail;cover.hidden=false}
 function stop(){const a=active;active=null;if(a){clearTimeout(a.timer);a.frame?.remove()}}
 function makePlayer(mode,token){const js=`
@@ -140,7 +160,7 @@ function tryNext(s){if(active!==s)return;clearTimeout(s.timer);s.frame?.remove()
  if(!navigator.onLine){endSession(s,'Bağlantı bekleniyor','İnternet yokken kaynaklar cezalandırılmaz.');return}
  const source=s.sources[s.index++];s.attempts++;
  const token=`${++serial}-${Math.random().toString(36).slice(2)}`;const frame=document.createElement('iframe');frame.title='Yerel test oynatıcısı';frame.sandbox='allow-scripts';frame.allow='autoplay';frame.referrerPolicy='no-referrer';
- s.source=source;s.token=token;s.frame=frame;s.done=false;s.start=performance.now();screen.dataset.source=source.id;frame.srcdoc=makePlayer(source.mode,token);screen.insertBefore(frame,cover);
+ s.source=source;s.token=token;s.frame=frame;s.done=false;s.start=performance.now();screen.dataset.source=source.id;frame.srcdoc=makePlayer(labMode(source),token);screen.insertBefore(frame,cover);
  showCover('Yayın hazırlanıyor');$('status').textContent='Oynatma kanıtı bekleniyor…';$('badge').textContent='KONTROL';
  s.timer=setTimeout(async()=>{if(active!==s||s.token!==token||s.done)return;s.done=true;await remember(source,'unknown');if(active===s)tryNext(s)},TIMEOUT_MS);
 }
@@ -244,15 +264,15 @@ async function updateCatalog(localOnly=false){if(working)return;working=true;$('
   if(result==='updated'){
    state=await readStore('meta','catalog');catalog=item;const oldId=active?.channel?.id;
    const selected=catalog.channels.find(c=>c.id===oldId)||catalog.channels[0];
-   stop();renderChannels(selected.id);choose(selected);
+   stop();renderChannels(selected?.id||null);if(selected)choose(selected);else showCover('Katalog boş','Yayınlanmış kanal yok.');
    $('updateStatus').textContent=`Katalog v${item.version} yüklendi · ${data.kind}`;
   }else $('updateStatus').textContent=`Katalog v${item.version} zaten güncel · ${data.kind}`;
   refreshInfo();
  }catch(e){$('updateStatus').textContent='Güncelleme yapılmadı: '+e.message}
  finally{working=false;$('update').disabled=false}
 }
-async function resetLab(){stop();memory.clear();
- if(durable){await new Promise((resolve,reject)=>{const tx=db.transaction(['history','catalogs','meta'],'readwrite');tx.objectStore('history').clear();tx.objectStore('catalogs').clear();tx.objectStore('catalogs').put(INITIAL);tx.objectStore('meta').put({id:'catalog',active:1,previous:null,highWater:1,hash:null});tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)})}
+async function resetLab(){stop();memory.clear();favorites.clear();
+ if(durable){await new Promise((resolve,reject)=>{const tx=db.transaction(['history','catalogs','meta','profile'],'readwrite');tx.objectStore('profile').clear();tx.objectStore('history').clear();tx.objectStore('catalogs').clear();tx.objectStore('catalogs').put(INITIAL);tx.objectStore('meta').put({id:'catalog',active:1,previous:null,highWater:1,hash:null});tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)})}
  state={id:'catalog',active:1,previous:null,highWater:1,hash:null};catalog=INITIAL;renderChannels(catalog.channels[0].id);$('updateStatus').textContent='Test verileri sıfırlandı · Katalog v1';refreshInfo();choose(catalog.channels[0]);
 }
 $('update').addEventListener('click',()=>updateCatalog(false));
@@ -262,8 +282,8 @@ $('reset').addEventListener('click',()=>resetLab().catch(e=>$('updateStatus').te
 (async()=>{
  try{db=await openDB();durable=true;await loadData();}
  catch(e){durable=false;catalog=INITIAL;$('updateStatus').textContent='Yerel veritabanı erişimi yok · Güncelleme kaydedilemez';}
- setupDone=true;renderChannels(catalog.channels[0].id);refreshInfo();
+ setupDone=true;renderChannels(catalog.channels[0]?.id||null);refreshInfo();
  if(durable)$('updateStatus').textContent=`Katalog v${catalog.version} · Güncelle yalnız düğmeyle · GitHub Pages`;
- choose(catalog.channels[0]);
+ if(catalog.channels.length)choose(catalog.channels[0]);else showCover('Katalog boş','Yayınlanmış kanal yok.');
 })();
 </script></body></html>
