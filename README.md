@@ -1,28 +1,35 @@
 # SefaXTV — Akıllı Web TV
 
-**İzleyici: 0.9**, yalnız kendi ürettiğimiz laboratuvar görüntüsü. Site herkese açıktır:
-https://sedathut-sys.github.io/sefaxtv/
+**İzleyici: 0.9 · güncel imzalı katalog: v4 (6 laboratuvar kanalı / 25 kaynak).**
 
-## Mevcut yayın
+Kamusal GitHub Pages: https://sedathut-sys.github.io/sefaxtv/
 
-- `index.html`: tek HTML izleyici, CLIENT_BUILD=9; imzalı katalog okuma, favori, arama, kategori, örtülü oynatma.
-- `catalog/latest.json`: **hâlâ sağlam v3 manifesti**; bu anahtara dokunulmadı.
-- `catalog/v3.json`: **hâlâ sağlam v3 katalog**; bu dosyaya dokunulmadı.
-- GitHub Pages yalnız kullanıcının Güncelle düğmesine basmasıyla katalog okunacak HTTPS adrestir. İçerikte yalnız laboratuvar kaynakları vardır.
+Bu bir test prototipidir. Tüm kaynaklar kendi oluşturduğumuz `lab` görüntüleridir. Yetkisi doğrulanmamış üçüncü taraf spor veya TV yayını içermez. GitHub Pages **herkese açıktır**.
 
-## 0.9 imza anahtarı geçişi — henüz tamamlanmadı
+## Güven zinciri
 
-Özel anahtar **yalnız yönetici bilgisayarında** oluşturulacak. Yerel yönetici imzalama HTML'i, şifreli yedek, parolalar, taslak dosyalar, GitHub tokenları ve izin belgeleri **public depoya konulmaz**.
+- `index.html`: tek HTML izleyici, `CLIENT_BUILD=9`, eski `tv-lab-05` ile yeni `sefaxtv-7777dfd54f34cab3209c0080` **açık** anahtarlarını tanır.
+- `catalog/latest.json`: P-256 ECDSA/SHA-256 imzalı, **v4** manifesti.
+- `catalog/v4.json`: SHA-256 özeti manifestte sabitlenmiş, altıncı kanalı ekleyen tam katalog.
+- `catalog/v3.json`: geriye uyumluluk için saklanan önceki doğrulanmış katalog.
 
-Yönetici kendi bilgisayarında yerel HTML ile yeni P-256 anahtarı üretir, PBKDF2-SHA256 / AES-256-GCM şifreli yedeğini ve parolasını güvenle saklar, yedeği tekrar açmayı test eder. Yerel araç mevcut 5 test kanalını ve kaynak kimliklerini koruyan, ayrıca bir imzalı test kanalı ekleyen v4 taslağını imzalar. Dışa aktarılan **tek kamusal teslim paketinde** sadece `keyId`, `publicJwk`, `catalogText` ve `latestText` gibi kamuya açık bilgiler bulunur.
+**0.9/v4 yayın sırası tamamlandı:** Önce yeni açık anahtar izleyiciye eklendi ve GitHub Pages dağıtımı başarıyla tamamlandı. Sonra imzalı `v4.json` dağıtıldı ve doğrulandı. **En son** `latest.json` v4'e çevrildi. GitHub Actions her üç aşamanın dağıtımını da başarılı bildirdi. Eski v3 dosyaları değiştirilmedi.
 
-Paket geldiğinde yayın işlemi **her adım doğrulandıktan sonra** yapılır:
+İzleyici kataloğu yalnız **Güncelle** düğmesine basıldığında HTTPS üzerinden okur. ECDSA imzası, katalog SHA-256 özeti, şema/sürüm ve 20 kaynak sınırı kontrol edilir. Katalog/favori/geçmiş yerel IndexedDB'de yönetilir. Tarayıcı site verilerini temizlerse yerel kayıtlar kaybolabilir.
 
-1. Kamusal paket anahtar kimliği, imza, katalog SHA-256 ve v4 şeması doğrulanır.
-2. `publicJwk` güvenilen açık anahtar listesine eklenir; GitHub Pages dağıtımı başarılı olana kadar katalog değişmez.
-3. Önce `catalog/v4.json` yayımlanır; bu dağıtım ve yayımlanacak baytların özeti doğrulanır.
-4. **En son** `catalog/latest.json` işaretçisi v4'e değiştirilir; daha eski sürümle geri alma yapılmaz.
+## Yönetici güvenliği
 
-Ayrı yöneticinin özel imza anahtarı olmadan veya işbu kontroller geçmeden **v4 kamuya yayımlanmaz**. Bu, bilinmeyen bir açık anahtarı otomatik olarak kabul eden güvensiz bir düzenek değildir.
+Yönetici HTML aracı, özel anahtar, parola, şifreli yedek ve GitHub erişim belirteci **bu halka açık depoda bulunmaz**. Özel imza anahtarı yönetici bilgisayarında üretildi; yönetici, yalnız `publicJwk` ve imzalı içerikten oluşan kamusal teslim paketini sağladı. Parola ve şifreli yedek yalnız yönetici tarafından saklanmalıdır.
 
-GitHub Pages herkese açık statik bir sitedir; bu depo özel erişim sağlamaz. İzinli üçüncü taraf sağlayıcı adaptörü ve gerçek kanal hâlâ yoktur.
+GitHub'a yükleme/yayın yetkisi izleyici kodunda yoktur. Yönetici taslağının değiştirilmesi, tek başına merkezi kataloğu değiştirmez.
+
+## Test ve sınırlamalar
+
+- ECDSA P-256 64 bayt `r||s` imzası bağımsız Python cryptography ve Node WebCrypto ile doğrulandı.
+- SHA-256 özet eşleşmesi, kaynak/kanal sınırları, v3 geriye uyumluluk, değiştirilmiş imza/veri ve bilinmeyen anahtar reddi kontrol edildi.
+- GitHub Pages dağıtım işlemleri başarılı. Bu çalışma ortamında canlı HTTPS sitesine otomatik tarayıcı erişimi `ERR_BLOCKED_BY_ADMINISTRATOR` ile engellendi. Gerçek sitede Güncelle ve kalıcı IndexedDB davranışı tam uçtan uca doğrulanamadı.
+- Yalnız deneysel görüntü üretimi; gerçek yayın sağlayıcı adaptörleri ve kullanım izinleri henüz eklenmedi.
+
+## İleride yeni katalog sürümü
+
+Yönetici, **aynı yerel imza anahtarının güvenli yedeğini** kullanarak monoton artan sürüm numarasıyla yeni paket imzalar. Önce yeni sürümlü katalog yüklenip doğrulanır; en son imzalı `latest.json` değiştirilir. Daha düşük sürüme dönülmez.
