@@ -1,27 +1,35 @@
 # SefaXTV — Akıllı Web TV
 
-**Güncel kamuya açık laboratuvar sürümü: 0.7.** Yalnız kendi ürettiğimiz test videosu; gerçek TV veya spor yayını içermiyor.
+**Kamuya açık test sürümü: 0.8 (tek HTML).**
+Yayın: https://sedathut-sys.github.io/sefaxtv/
 
-Yayın adresi: https://sedathut-sys.github.io/sefaxtv/
+Bu depo sadece kendi laboratuvar görüntümüzü oynatır; resmî yayıncı izinleri doğrulanmadan gerçek TV veya spor yayını içermez. GitHub Pages web sitesi **herkese açıktır**.
 
-## İzleyici sitesi
+## Güncelle ve imza güvenliği
 
-- `index.html`: tek HTML (CSS ve JS içeride). Arama, kategori, tarayıcıya özgü favoriler ve doğrulanmış oynatma kapağı.
-- `catalog/latest.json`: WebCrypto ECDSA P-256 ile imzalı manifest.
-- `catalog/v3.json`: yayınlanan son **imzalı** test kataloğu. 0.7 arayüzü bu v3 dosyasıyla geriye uyumlu.
-- `Güncelle` düğmesi dışarıdan imzalı katalog alır; yönetim yetkisi vermez.
+- `index.html`: yalnız izleyici. Katalog yalnız kullanıcı **Güncelle** düğmesine bastığında HTTPS üzerinden indirilir.
+- `catalog/latest.json`: imzalı manifest (P-256 ECDSA/SHA-256; ham UTF-8 manifest baytları base64url içinde).
+- `catalog/v3.json`: mevcut canlı imzalı test kataloğu. **0.8 geçişinde değiştirilmedi.**
+- Veriler ve favoriler izleyicinin IndexedDB'sinde saklanır. Yönetici parolası, GitHub tokenı veya özel imza anahtarı izleyiciye konulmaz.
 
-## Güvenlik / yönetici
+## 0.8 — yönetici/yayın protokolü
 
-GitHub Pages ve kaynak dosyaları **herkese açık**. İzleyici uygulamasında parola, özel anahtar, GitHub tokenı veya yönetici düzenleme ekranı bulunmaz.
+Yerel yönetici imzalama HTML'i **bu public depoda BULUNMAZ**. Yerel araç kategori/kanal taslağını hazırlar. Yeni P-256 özel anahtarı yönetici bilgisayarında üretir; **PBKDF2-SHA256 (600.000 iterasyon) + AES-256-GCM** ile şifrelenmiş PKCS#8 yedeğini sadece yöneticiye indirir. Parola ayrı saklanır. Bellekte kullanılan özel CryptoKey dışa aktarılamaz; sayfa kapandığında dosya yedeği olmadan tekrar açılamaz.
 
-Yöneticiye ait v0.7 HTML taslak düzenleyicisi **kamu deposuna yüklenmez**; yalnız yerel bilgisayarda tutulur. Kategori, kanal ve en çok 20 laboratuvar kaynağını düzenleyip **imzasız taslak** dışa aktarabilir. Taslak katalogların yayımlanabilmesi için sonraki aşamada yerel imzalama ve GitHub yetkili yayın akışı gerekir.
+**İki aşamalı güvenli yayın:**
 
-Resmî sağlayıcı ve yayın izinleri doğrulanmadan hiçbir üçüncü taraf kaynak eklenmez. Mevcut `lab` sağlayıcısı yalnız öz üretim test görüntüsünü gösterir.
+1. Yönetici anahtarını yerel aracında üretir, **şifreli yedeğini ve parolasını güvenle saklar**; yalnızca `keyId` ve açık JWK anahtarını yetkili yayıncıya verir.
+2. Yeni **açık** anahtarı `index.html` içindeki `TRUSTED_PUBLIC_KEYS` listesine ekleriz. GitHub Pages dağıtımının başarılı olduğunu doğrularız. Eski `tv-lab-05` anahtarı ve çalışan v3 aynen kalır.
+3. Yönetici, v4 taslağını doğrulayıp özel anahtarla `v4.json` ve `latest.json` üretir. Aracın çıktısı iki ayrı dosyadır; şifreli yedek **asla yayın dosyası değildir**.
+4. Yetkili GitHub hesabıyla **önce** `catalog/v4.json` dosyasını yükler, yayımlanmış dosyanın bayt özetini doğrularız. **En son** `catalog/latest.json` dosyasını değiştiririz. `latest` yüklenene dek eski imzalı v3 günceldir.
+5. Yeni pakette hata varsa eski sürüme işaret eden manifesti geri koymayız. En son sağlam içerikle **daha yüksek sürüm numarası** imzalarız. GitHub'ın site dağıtım geçmişini kontrol ederiz.
 
-## Durum
+**Yayın ayrılığı:** Bu depo yalnız izleyici ve kamusal JSON kataloğudur. Özel anahtar, anahtar yedeği, imzasız taslak, yönetici HTML'i ve GitHub erişim belirteci bu depoya yüklenmez. Yönetici HTML'i ağ isteği veya GitHub API çağrısı yapmaz; yetkilendirilmiş GitHub yayımlaması ayrı işlemdir.
 
-- GitHub Pages dağıtımı doğrulandı.
-- ECDSA imza, SHA-256, şema ve kötü paket reddi otomatik test edildi.
-- Chromium ortamında arama, kategori, favori ve yerel düzenleyici kontrolleri geçti.
-- IndexedDB yükseltmesi ve favori koruma mantığı simüle edildi. Gerçek tarayıcıda canlı siteye erişim/kayıt kalıcılığı ayrı kabul testidir.
+**Mevcut durum:** 0.8 izleyicinin çoklu açık anahtar doğrulama yapısı hazır, ancak yeni yöneticinin açık anahtarı henüz üretilmediği için güven listesinde yalnız v3'ün `tv-lab-05` anahtarı bulunuyor. Bu nedenle yeni v4 **henüz yayımlanmadı**.
+
+## Kontroller
+
+- ECDSA oluşturma, doğrulama, yanlış parola, değiştirilmiş içerik, SHA-256 ve 20 kaynak sınırı otomatik test edildi.
+- Tek HTML izleyici ve yerel yönetici formu Chromium'da temel UI testinden geçti.
+- GitHub Pages yayımlama işinin durumu GitHub Actions üzerinden kontrol edilir. Gerçek canlı HTTPS + IndexedDB uçtan uca tarayıcı testi ayrıca gereklidir.
