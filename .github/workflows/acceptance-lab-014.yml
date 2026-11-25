@@ -1,0 +1,20 @@
+name: SefaXTV 0.14 Two-origin LAB
+on:
+  push:
+    branches: ['lab/sefaxtv-acceptance-v014']
+    paths: ['acceptance/**', '.github/workflows/acceptance-lab-014.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  two-origin:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install playwright==1.52.0
+      - run: python -m playwright install --with-deps chromium
+      - run: python acceptance/test_two_origins.py
