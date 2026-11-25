@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>WinExe</OutputType><TargetFramework>net8.0-windows</TargetFramework><UseWindowsForms>true</UseWindowsForms><Nullable>enable</Nullable><ImplicitUsings>enable</ImplicitUsings><AssemblyName>SefaXTV.WindowsLab</AssemblyName><Version>0.13.0</Version></PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="tests/**/*.cs" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.4314.35" />
+    <EmbeddedResource Include="assets/index.html" LogicalName="SefaXTV.Assets.index.html" />
+    <EmbeddedResource Include="assets/lab-player.html" LogicalName="SefaXTV.Assets.lab-player.html" />
+    <EmbeddedResource Include="assets/observer.js" LogicalName="SefaXTV.Assets.observer.js" />
+  </ItemGroup>
+</Project>
