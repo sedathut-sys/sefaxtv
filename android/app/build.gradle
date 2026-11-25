@@ -1,0 +1,9 @@
+plugins { id 'com.android.application' }
+android {
+ namespace 'com.sefaxtv.lab'
+ compileSdk 35
+ defaultConfig { applicationId 'com.sefaxtv.lab.v012'; minSdk 24; targetSdk 34; versionCode 12; versionName '0.12-lab' }
+ compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+ buildTypes { release { minifyEnabled false } }
+}
+dependencies { implementation 'androidx.webkit:webkit:1.14.0' }
