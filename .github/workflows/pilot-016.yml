@@ -1,0 +1,28 @@
+name: SefaXTV 0.16 External VOD diagnostic
+on:
+  push:
+    branches: ['lab/sefaxtv-pilot-v016']
+    paths: ['pilot016/**', '.github/workflows/pilot-016.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  diagnostic:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node pilot016/test-progress.mjs
+      - run: |
+          npm install --no-save --ignore-scripts --package-lock=false @peertube/embed-api@0.2.0
+          mkdir -p pilot016/vendor
+          cp node_modules/@peertube/embed-api/build/player.min.js pilot016/vendor/
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install playwright==1.52.0
+      - run: python -m playwright install --with-deps chromium
+      - run: python pilot016/test_external.py
