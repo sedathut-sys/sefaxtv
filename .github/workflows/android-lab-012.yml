@@ -27,6 +27,8 @@ jobs:
         run: |
           javac -d "$RUNNER_TEMP/sefa-gate" app/src/main/java/com/sefaxtv/lab/ProbeGate.java tests/ProbeGateTest.java
           java -cp "$RUNNER_TEMP/sefa-gate" com.sefaxtv.lab.ProbeGateTest
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
       - name: Build debug APK
         run: |
           sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
