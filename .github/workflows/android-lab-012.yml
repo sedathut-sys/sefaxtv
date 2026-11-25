@@ -1,0 +1,38 @@
+name: SefaXTV Android LAB 0.12
+on:
+  push:
+    branches: [lab/sefaxtv-android-v012]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  debug-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: android
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Session gate tests
+        run: |
+          javac -d "$RUNNER_TEMP/sefa-gate" app/src/main/java/com/sefaxtv/lab/ProbeGate.java tests/ProbeGateTest.java
+          java -cp "$RUNNER_TEMP/sefa-gate" com.sefaxtv.lab.ProbeGateTest
+      - name: Build debug APK
+        run: |
+          sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
+          gradle --no-daemon :app:assembleDebug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SefaXTV-0.12-LAB-debug
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 7
