@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SefaXTV · Android Test 0.12</title>
+<style>
+:root{font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif;color-scheme:dark;background:#0b1020;color:#f6f8fe}
+*{box-sizing:border-box}body{margin:0}main{max-width:1160px;margin:auto;padding:24px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:22px}h1{font-size:clamp(21px,3vw,30px);margin:0;letter-spacing:-.7px}header small{color:#96a4c2}
+.layout{display:grid;grid-template-columns:255px minmax(0,1fr);gap:18px}.side{min-width:0;display:flex;flex-direction:column;gap:11px}.side input[type=search],.side select{width:100%;padding:11px 12px;background:#17213a;color:#f6f8fe;border:1px solid #33435f;border-radius:9px;font:inherit}.side input:focus-visible,.side select:focus-visible{outline:2px solid #61a9ff}.filter-row{display:flex;align-items:center;gap:7px;font-size:13px;color:#b6c5df}.filter-row input{accent-color:#64affb}.channel-note{font-size:12px;color:#9dacc8}.entry{display:flex;gap:6px;align-items:stretch}nav{display:flex;flex-direction:column;gap:9px;min-width:0}.entry>button:first-child{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}.entry>.fav{width:39px;flex:0 0 39px;text-align:center;padding:8px 0;color:#b7c3d9}.entry>.fav[aria-pressed=true]{color:#ffc862;border-color:#cf9d39;background:#382b18}.empty-list{color:#afbad0;font-size:13px;padding:10px}button{font:inherit;cursor:pointer}
+nav button{background:#17213a;color:#d8e4f8;border:1px solid #2b3854;border-radius:12px;padding:14px 13px;text-align:left}nav button:hover,nav button:focus-visible{border-color:#61a9ff;outline:2px solid transparent}nav button.active{background:#214b7a;color:#fff;border-color:#5ba6f8}
+.tv{position:relative;background:#030711;border:1px solid #29344d;border-radius:13px;overflow:hidden;aspect-ratio:16/9}.tv iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}
+.cover{position:absolute;inset:0;background:linear-gradient(140deg,#0d1429,#121e35);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;padding:20px;z-index:2}.cover[hidden]{display:none}.symbol{font-size:40px;line-height:1;color:#6eb6ff}.cover strong{font-size:clamp(17px,2vw,24px)}.cover span{font-size:13px;color:#aebad2}
+.caption{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-top:12px;color:#bac8e2;font-size:13px}.label{background:#17243d;border:1px solid #2c4162;border-radius:99px;padding:5px 10px;white-space:nowrap}
+.tools{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-top:16px}.tools button{background:#214b7a;color:#fff;border:1px solid #5ba6f8;border-radius:9px;padding:9px 14px}.tools button:disabled{opacity:.55;cursor:wait}.tools small{color:#a6b6d0}
+.lab{color:#8290ae;font-size:12px;margin-top:15px;line-height:1.55}.lab summary{cursor:pointer;width:max-content}.lab button{background:#17213a;color:#d8e4f8;border:1px solid #2b3854;border-radius:7px;padding:7px 10px;margin-top:8px}.lab p{margin:7px 0}.settings{display:flex;gap:8px;flex-wrap:wrap;margin:7px 0}.settings input{flex:1;min-width:210px;border:1px solid #34476a;border-radius:8px;background:#0e1629;color:#f6f8fe;padding:8px 10px;font:inherit}.settings input:focus-visible{outline:2px solid #61a9ff}.note{color:#7f91b5;font-size:12px;line-height:1.55;margin-top:12px}
+@media(max-width:730px){main{padding:14px}.layout{grid-template-columns:1fr}.side{gap:8px}nav{flex-direction:row;overflow-x:auto}.entry{flex:0 0 auto}.entry>button:first-child{min-width:125px;max-width:195px;white-space:nowrap;padding:11px}.caption{flex-wrap:wrap}}
+</style></head><body>
+<main>
+<header><h1>SefaXTV</h1><small>Tek HTML · Android Test 0.12 · İmzalı v4</small></header>
+<div class="layout"><aside class="side"><input id="search" type="search" placeholder="Kanal ara…" aria-label="Kanal ara" maxlength="120" autocomplete="off"><select id="category" aria-label="Kategori"><option value="">Tüm kategoriler</option></select><label class="filter-row"><input type="checkbox" id="onlyFavorites"> Yalnız favoriler</label><small class="channel-note" id="channelCount" role="status"></small><nav id="channels" aria-label="Test kanalları"></nav></aside><div>
+<section class="tv" id="screen" aria-label="TV ekranı"><div class="cover" id="cover" aria-live="polite"><div class="symbol">◉</div><strong id="coverTitle">Yayın hazırlanıyor</strong><span id="coverDetail">Oynatma doğrulanıyor…</span></div></section>
+<div class="caption"><span id="status" role="status">Başlatılıyor…</span><span class="label" id="badge">TEST</span></div>
+<div class="tools"><button id="update" type="button">↻ Güncelle</button><button id="moreSources" type="button" hidden>Diğer kaynakları dene</button><small id="updateStatus" role="status">Katalog hazırlanıyor…</small></div>
+<details class="lab"><summary>Test bilgisi</summary><p id="memory">Yerel hafıza kontrol ediliyor…</p><p id="diagnostic"></p><p id="sourceInfo"></p><p id="remoteInfo">GitHub Pages katalog adresi hazırlanıyor…</p><button type="button" id="demoUpdate">Eski v3 imza testi</button><button type="button" id="labStall">Donma → yedek testi</button><button id="nativeLab" type="button" hidden>Native LAB → yedek testi</button><p id="bridgeInfo"></p><button type="button" id="reset">Laboratuvar hafızasını sıfırla</button></details>
+<p class="note">v0.12 Android LAB: Oynatma yalnız kanal seçimiyle başlar. Web ve native kanıt yolları ayrıdır. Katalog yalnız LAB kaynaklarını kabul eder; native köprü yalnız paketlenmiş kendi test oynatıcımız içindir.</p>
+</div></div></main>
+<script>
+'use strict';
+// v0.9 — Yeni yönetici açık anahtarı için güven yuvası. İmzalı v3 canlıdır; yeni anahtar yalnız doğrulanınca eklenir. Yönetici aracı kamusal sayfaya dahil edilmez.
+// Özel DunyaTV deposu herkese açık katalog değildir; dosyalar kamuya açık HTTPS statik sitede yayımlanmalıdır.
+const CLIENT_BUILD=12,MAX_SOURCES=20,MAX_ATTEMPTS=3,TIMEOUT_MS=10000,STATUS_MS=6500,STALL_MS=8000,HEARTBEAT_TICK_MS=1200,DB_NAME='akilli-web-tv-lab-v03';
+const INITIAL={"schemaVersion":1,"version":1,"channels":[{"id":"video","name":"Canlı görüntü testi","sources":[{"id":"video-1","mode":"play","revision":1,"priority":1,"enabled":true}]},{"id":"yedek","name":"Otomatik yedek testi","sources":[{"id":"yedek-a","mode":"fail","revision":1,"priority":1,"enabled":true},{"id":"yedek-b","mode":"play","revision":1,"priority":2,"enabled":true},{"id":"yedek-yedek-3","mode":"ready","revision":1,"priority":3,"enabled":true},{"id":"yedek-yedek-4","mode":"ready","revision":1,"priority":4,"enabled":true},{"id":"yedek-yedek-5","mode":"ready","revision":1,"priority":5,"enabled":true},{"id":"yedek-yedek-6","mode":"ready","revision":1,"priority":6,"enabled":true},{"id":"yedek-yedek-7","mode":"ready","revision":1,"priority":7,"enabled":true},{"id":"yedek-yedek-8","mode":"ready","revision":1,"priority":8,"enabled":true},{"id":"yedek-yedek-9","mode":"ready","revision":1,"priority":9,"enabled":true},{"id":"yedek-yedek-10","mode":"ready","revision":1,"priority":10,"enabled":true},{"id":"yedek-yedek-11","mode":"ready","revision":1,"priority":11,"enabled":true},{"id":"yedek-yedek-12","mode":"ready","revision":1,"priority":12,"enabled":true},{"id":"yedek-yedek-13","mode":"ready","revision":1,"priority":13,"enabled":true},{"id":"yedek-yedek-14","mode":"ready","revision":1,"priority":14,"enabled":true},{"id":"yedek-yedek-15","mode":"ready","revision":1,"priority":15,"enabled":true},{"id":"yedek-yedek-16","mode":"ready","revision":1,"priority":16,"enabled":true},{"id":"yedek-yedek-17","mode":"ready","revision":1,"priority":17,"enabled":true},{"id":"yedek-yedek-18","mode":"ready","revision":1,"priority":18,"enabled":true},{"id":"yedek-yedek-19","mode":"ready","revision":1,"priority":19,"enabled":true},{"id":"yedek-yedek-20","mode":"ready","revision":1,"priority":20,"enabled":true}]},{"id":"kapak","name":"Kapak güvenlik testi","sources":[{"id":"kapak-1","mode":"ready","revision":1,"priority":1,"enabled":true}]}],"revokedPermissionIds":[]};
+const LAB_PUBLIC_KEY={"kty":"EC","crv":"P-256","x":"3TDgnlSWrom_1f_dxW89WoshOCom_CNpKNAzo3EyNCY","y":"KI5hmB8g5FBTFPc4KVC86T6DZExn0Vv2Uu8PfSwfxVQ","ext":true,"key_ops":["verify"]};
+// 0.9 güven halkası: yönetici tarafından teslim edilen kamusal anahtar, doğrulanmış v4 paketinden pinlendi.
+// DİKKAT: Yalnızca kimliği doğrulanmış PUBLIC paketten alınan açık anahtar buraya eklenebilir.
+// 0.9 geçiş sırası: önce bu HTML, sonra catalog/v4.json, son adımda catalog/latest.json.
+// Özel anahtar, GitHub tokenı ve yerel yönetici aracı izleyiciye aktarılmaz.
+const TRUSTED_PUBLIC_KEYS=Object.freeze({'tv-lab-05':LAB_PUBLIC_KEY,"sefaxtv-7777dfd54f34cab3209c0080":{"kty":"EC","crv":"P-256","x":"PpkQii0yKcgzp7KeNyDKhDNVNnwrh843Z9ZpSNv7n-s","y":"Guwjxc4rqYkoSZtK3Sxv-k5UkZPQRBQyIGfEnbJskgg","ext":true,"key_ops":["verify"]}});
+const LAB_ENVELOPE={"keyId":"tv-lab-05","payload":"eyJzY2hlbWFWZXJzaW9uIjoxLCJ2ZXJzaW9uIjozLCJtaW5DbGllbnRCdWlsZCI6NSwicHVibGlzaGVkQXQiOiIyMDI2LTExLTIzVDIwOjAwOjAwWiIsImNhdGFsb2dTaGEyNTYiOiI2MTI4OTY3YzU4MzBjOTE4MTJjYzYwOGJhODFkNzNkODRjYjRjODgxMWIwOTM4OWEwNDk1MmM2NWM2MTg0NDI0In0","signature":"HVOqP4TymjolnILomB4RBexOUr1VQz3uY9PUoVzyN0tWrNM-VNycRaCUK8doey-1INieaAMmWXPKqBrZS-bcdA"};
+const LAB_CATALOG_TEXT="{\"schemaVersion\":1,\"version\":3,\"channels\":[{\"id\":\"video\",\"name\":\"Canlı görüntü testi\",\"sources\":[{\"id\":\"video-1\",\"mode\":\"play\",\"revision\":1,\"priority\":1,\"enabled\":true}]},{\"id\":\"yedek\",\"name\":\"Otomatik yedek testi\",\"sources\":[{\"id\":\"yedek-a\",\"mode\":\"fail\",\"revision\":1,\"priority\":1,\"enabled\":true},{\"id\":\"yedek-b\",\"mode\":\"play\",\"revision\":1,\"priority\":2,\"enabled\":true},{\"id\":\"yedek-yedek-3\",\"mode\":\"ready\",\"revision\":1,\"priority\":3,\"enabled\":true},{\"id\":\"yedek-yedek-4\",\"mode\":\"ready\",\"revision\":1,\"priority\":4,\"enabled\":true},{\"id\":\"yedek-yedek-5\",\"mode\":\"ready\",\"revision\":1,\"priority\":5,\"enabled\":true},{\"id\":\"yedek-yedek-6\",\"mode\":\"ready\",\"revision\":1,\"priority\":6,\"enabled\":true},{\"id\":\"yedek-yedek-7\",\"mode\":\"ready\",\"revision\":1,\"priority\":7,\"enabled\":true},{\"id\":\"yedek-yedek-8\",\"mode\":\"ready\",\"revision\":1,\"priority\":8,\"enabled\":true},{\"id\":\"yedek-yedek-9\",\"mode\":\"ready\",\"revision\":1,\"priority\":9,\"enabled\":true},{\"id\":\"yedek-yedek-10\",\"mode\":\"ready\",\"revision\":1,\"priority\":10,\"enabled\":true},{\"id\":\"yedek-yedek-11\",\"mode\":\"ready\",\"revision\":1,\"priority\":11,\"enabled\":true},{\"id\":\"yedek-yedek-12\",\"mode\":\"ready\",\"revision\":1,\"priority\":12,\"enabled\":true},{\"id\":\"yedek-yedek-13\",\"mode\":\"ready\",\"revision\":1,\"priority\":13,\"enabled\":true},{\"id\":\"yedek-yedek-14\",\"mode\":\"ready\",\"revision\":1,\"priority\":14,\"enabled\":true},{\"id\":\"yedek-yedek-15\",\"mode\":\"ready\",\"revision\":1,\"priority\":15,\"enabled\":true},{\"id\":\"yedek-yedek-16\",\"mode\":\"ready\",\"revision\":1,\"priority\":16,\"enabled\":true},{\"id\":\"yedek-yedek-17\",\"mode\":\"ready\",\"revision\":1,\"priority\":17,\"enabled\":true},{\"id\":\"yedek-yedek-18\",\"mode\":\"ready\",\"revision\":1,\"priority\":18,\"enabled\":true},{\"id\":\"yedek-yedek-19\",\"mode\":\"ready\",\"revision\":1,\"priority\":19,\"enabled\":true},{\"id\":\"yedek-yedek-20\",\"mode\":\"ready\",\"revision\":1,\"priority\":20,\"enabled\":true}]},{\"id\":\"kapak\",\"name\":\"Kapak güvenlik testi\",\"sources\":[{\"id\":\"kapak-1\",\"mode\":\"ready\",\"revision\":1,\"priority\":1,\"enabled\":true}]},{\"id\":\"ek-test\",\"name\":\"Güncellenen test kanalı\",\"sources\":[{\"id\":\"ek-test-1\",\"mode\":\"play\",\"revision\":1,\"priority\":1,\"enabled\":true}]},{\"id\":\"uzak-test\",\"name\":\"İnternetten gelen test kanalı\",\"sources\":[{\"id\":\"uzak-test-1\",\"mode\":\"play\",\"revision\":1,\"priority\":1,\"enabled\":true}]}],\"revokedPermissionIds\":[]}\n";
+const $=id=>document.getElementById(id),nav=$('channels'),screen=$('screen'),cover=$('cover');
+let db=null,durable=false,setupDone=false,catalog=INITIAL,memory=new Map(),active=null,serial=0,working=false,selectedChannelId=null,favorites=new Set();
+const NATIVE_APP='https://appassets.androidplatform.net/assets/index.html';
+const NATIVE_PLAYER='https://appassets.androidplatform.net/assets/lab-player.html';
+const nativeTransport=location.href===NATIVE_APP ? (window.SefaXTVNative?.postMessage ? {kind:'android',send:m=>window.SefaXTVNative.postMessage(m),listen:fn=>{window.SefaXTVNative.onmessage=e=>fn(e.data)}} : window.chrome?.webview?.postMessage ? {kind:'windows',send:m=>window.chrome.webview.postMessage(m),listen:fn=>window.chrome.webview.addEventListener('message',e=>fn(e.data))}:null):null;
+let nativeReady=false;
+let state={id:'catalog',active:1,previous:null,highWater:1,hash:null};
+const IDENT=/^[a-z0-9][a-z0-9._-]{0,79}$/;
+// Yalnız belgeli izin + doğrulanabilir oynatma sinyali taşıyan sağlayıcılar için kod içi kayıt.
+// Katalogdan serbest iframe URL'si veya yeni köken kabul edilmez. Üretim adaptörleri ayrı kod incelemesi gerektirir.
+const FRAME_ADAPTERS=Object.freeze({lab:Object.freeze({id:'lab',permissionId:'lab-internal',origin:'null',sandbox:'allow-scripts',adapterVersion:1})});
+const LAB_KINDS=Object.freeze(['play','fail','ready','stall']);
+function categoriesFor(v){return Array.isArray(v.categories)?v.categories:[{id:'test',name:'Test kanalları'}]}
+function channelCategories(ch){return Array.isArray(ch.categoryIds)?ch.categoryIds:['test']}
+function labMode(src){return src.provider==='lab'&&src.permissionId===FRAME_ADAPTERS.lab.permissionId?src.contentId:(src.provider===undefined?src.mode:null)}
+function sourceAllowed(s){if(s?.provider==='native-lab')return nativeReady&&s.permissionId==='lab-internal'&&!catalog.revokedPermissionIds?.includes('lab-internal')&&['play','stall','ready'].includes(s.contentId);return !!s&&!!FRAME_ADAPTERS.lab&&!catalog.revokedPermissionIds?.includes(s.permissionId)&&LAB_KINDS.includes(labMode(s))}
+function validateCatalog(v){
+ if(!v||v.schemaVersion!==1||!Number.isSafeInteger(v.version)||v.version<1||!Array.isArray(v.channels)||v.channels.length>20||!Array.isArray(v.revokedPermissionIds)||v.revokedPermissionIds.length>200||new Set(v.revokedPermissionIds).size!==v.revokedPermissionIds.length||v.revokedPermissionIds.some(id=>!IDENT.test(id)))return false;
+ const legacy=v.version<=3&&!('categories' in v);
+ if(!legacy&&(!Array.isArray(v.categories)||!v.categories.length||v.categories.length>100))return false;
+ const cats=categoriesFor(v),catIds=new Set(),chids=new Set(),srcids=new Set();
+ for(const cat of cats){if(!cat||typeof cat.id!=='string'||!IDENT.test(cat.id)||catIds.has(cat.id)||typeof cat.name!=='string'||!cat.name.trim()||cat.name.length>120)return false;catIds.add(cat.id)}
+ for(const ch of v.channels){
+  if(!ch||typeof ch.id!=='string'||!IDENT.test(ch.id)||typeof ch.name!=='string'||!ch.name.trim()||ch.name.length>120||chids.has(ch.id)||!Array.isArray(ch.sources)||ch.sources.length>MAX_SOURCES)return false;
+  if(!legacy&&(!Array.isArray(ch.categoryIds)||!ch.categoryIds.length||new Set(ch.categoryIds).size!==ch.categoryIds.length||ch.categoryIds.some(id=>!catIds.has(id))||!(ch.logoSha256===null||typeof ch.logoSha256==='string'&&/^[a-f0-9]{64}$/.test(ch.logoSha256))))return false;
+  chids.add(ch.id);
+  for(const src of ch.sources){
+   if(!src||typeof src.id!=='string'||!IDENT.test(src.id)||srcids.has(src.id)||!Number.isSafeInteger(src.revision)||src.revision<1||!Number.isInteger(src.priority)||src.priority<1||src.priority>20||typeof src.enabled!=='boolean')return false;
+   if(legacy){if(!['play','fail','ready'].includes(src.mode))return false}
+   else if(src.provider!=='lab'||src.permissionId!==FRAME_ADAPTERS.lab.permissionId||!LAB_KINDS.includes(src.contentId)||Object.hasOwn(src,'mode')||Object.hasOwn(src,'url'))return false; // Yeni köken/sağlayıcı kimliği kataloğa eklenerek yetki kazanamaz.
+   srcids.add(src.id);
+  }
+ }
+ return true;
+}
+if(!validateCatalog(INITIAL))throw Error('Başlangıç kataloğu geçersiz');
+function request(req){return new Promise((resolve,reject)=>{req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error||Error('IDB hatası'))})}
+function openDB(){return new Promise((resolve,reject)=>{
+ if(!window.indexedDB){reject(Error('IndexedDB desteklenmiyor'));return}
+ const req=indexedDB.open(DB_NAME,3);
+ req.onupgradeneeded=()=>{const d=req.result;if(!d.objectStoreNames.contains('history'))d.createObjectStore('history',{keyPath:'key'});if(!d.objectStoreNames.contains('catalogs'))d.createObjectStore('catalogs',{keyPath:'version'});if(!d.objectStoreNames.contains('meta'))d.createObjectStore('meta',{keyPath:'id'});if(!d.objectStoreNames.contains('profile'))d.createObjectStore('profile',{keyPath:'id'})};
+ req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error||Error('Veritabanı açılamadı'));req.onblocked=()=>reject(Error('DB açık sekmede kilitli'));
+})}
+async function readStore(store,key){return request(db.transaction(store,'readonly').objectStore(store).get(key))}
+function transactSeed(){return new Promise((resolve,reject)=>{
+ const tx=db.transaction(['meta','catalogs'],'readwrite');const meta=tx.objectStore('meta'),cats=tx.objectStore('catalogs');let result;
+ const g=meta.get('catalog');g.onsuccess=()=>{
+  if(!g.result){meta.put({...state});cats.put(INITIAL);result={...state}}else result=g.result;
+ };tx.oncomplete=()=>resolve(result);tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error||Error('Kayıt iptal edildi'));
+})}
+async function loadData(){
+ if(!durable)return;
+ state=await transactSeed();
+ const valid=await readStore('catalogs',state.active);
+ if(valid&&validateCatalog(valid)&&valid.version===state.active)catalog=valid;
+ else if(state.active===1)catalog=INITIAL;
+ else { // Geçersiz etkin katalog: en son sağlam yerel sürüme düş, yüksek sürüm işaretini koru.
+  const previous=state.previous?await readStore('catalogs',state.previous):null;
+  catalog=(previous&&validateCatalog(previous))?previous:INITIAL;
+ }
+ const all=await new Promise((resolve,reject)=>{const req=db.transaction('history','readonly').objectStore('history').getAll();req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error)});
+ memory=new Map(all.map(x=>[x.key,x]));
+ const profile=await readStore('profile','favorites');favorites=new Set(Array.isArray(profile?.ids)?profile.ids.filter(x=>typeof x==='string'&&IDENT.test(x)):[]);
+}
+function saveHistory(record){return new Promise((resolve,reject)=>{
+ const tx=db.transaction('history','readwrite');tx.objectStore('history').put(record);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error||Error('Tarihçe yazılamadı'));
+})}
+function profileFor(s){return s.provider==='native-lab'?`${nativeTransport?.kind||'none'}-native-lab`:'web-lab'}
+function recordKey(s){return `${s.id}:r${s.revision}:${profileFor(s)}:adapter1`}
+function today(){const d=new Date();return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-')}
+function dayDelta(t){const a=new Date(t+'T12:00:00'),b=new Date(today()+'T12:00:00');return Math.max(0,Math.round((b-a)/86400000))}
+function reliability(s){const h=memory.get(recordKey(s));let S=0,F=0;if(h)for(const d of h.daily||[])if(dayDelta(d.date)<=90){const w=2**(-dayDelta(d.date)/14);S+=d.success*w;F+=d.failure*w}return(2+S)/(4+S+F)}
+function rank(sources){const now=Date.now();return sources.filter(s=>s.enabled&&sourceAllowed(s)).slice().sort((a,b)=>{
+ const ah=memory.get(recordKey(a)),bh=memory.get(recordKey(b));const ac=(ah?.retryAfter||0)>now,bc=(bh?.retryAfter||0)>now;
+ if(ac!==bc)return Number(ac)-Number(bc);
+ return Math.floor(20*reliability(b))-Math.floor(20*reliability(a))||a.priority-b.priority||a.id.localeCompare(b.id)
+})}
+async function remember(s,result,ms){
+ if(!['success','failure','unknown'].includes(result))return;
+ const key=recordKey(s),old=memory.get(key)||{key,sourceId:s.id,revision:s.revision,deviceProfile:profileFor(s),adapterVersion:1,lastResult:'untried',daily:[],recentStartMs:[],failureStreak:0,retryAfter:null};
+ const h={...old,daily:old.daily.map(x=>({...x})),recentStartMs:old.recentStartMs.slice()};h.lastResult=result;
+ if(result==='unknown'){h.retryAfter=Math.max(h.retryAfter||0,Date.now()+30000);}
+ if(result!=='unknown'){
+  const d=today();let item=h.daily.find(x=>x.date===d);if(!item){item={date:d,success:0,failure:0};h.daily.push(item)}item[result]++;
+  h.daily=h.daily.filter(x=>dayDelta(x.date)<=90).slice(-90);
+  if(result==='failure'){h.failureStreak++;h.retryAfter=Date.now()+[60000,300000,1800000][Math.min(2,h.failureStreak-1)]}
+  else{h.failureStreak=0;h.retryAfter=null;if(Number.isFinite(ms)&&ms>=0)h.recentStartMs=[...h.recentStartMs,Math.round(ms)].slice(-5)}
+ }
+ memory.set(key,h);if(durable){try{await saveHistory(h)}catch{durable=false;$('memory').textContent='Yerel hafıza yazılamadı · Oturumluk hafıza'}}
+ refreshInfo();
+}
+function refreshInfo(){if(!setupDone)return;
+ $('memory').textContent=durable?'IndexedDB etkin · 0.3 kaynak hafızası korunur.':'IndexedDB kapalı · Kalıcı kayıt kullanılamıyor.';
+ const c=catalog.channels.find(x=>x.id==='yedek');const first=c?rank(c.sources)[0]:null;
+ const successes=memory.get('yedek-b:r1:web-lab:adapter1')?.daily?.reduce((n,d)=>n+d.success,0)||0;
+ $('diagnostic').textContent=`Katalog v${catalog.version} · ${catalog.channels.length} test kanalı · ${favorites.size} favori · Yedek kaynağın doğrulanmış başarısı: ${successes}.`;
+ $('sourceInfo').textContent=`Yedek testinde ilk aday: ${first?.id||'yok'}. Kanal başına en çok ${MAX_SOURCES} kaynak.`;
+}
+function storeFavorites(){if(!durable)return Promise.resolve();return new Promise((resolve,reject)=>{const tx=db.transaction('profile','readwrite');tx.objectStore('profile').put({id:'favorites',ids:[...favorites]});tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error||Error('Favori kaydı başarısız'))})}
+function drawCategoryOptions(){const selected=$('category').value;const select=$('category');select.replaceChildren();const all=document.createElement('option');all.value='';all.textContent='Tüm kategoriler';select.add(all);for(const cat of categoriesFor(catalog)){const opt=document.createElement('option');opt.value=cat.id;opt.textContent=cat.name;select.add(opt)}select.value=[...select.options].some(x=>x.value===selected)?selected:''}
+function renderChannels(selected){selectedChannelId=selected;drawCategoryOptions();nav.replaceChildren();const search=$('search').value.trim().toLocaleLowerCase('tr-TR'),category=$('category').value,onlyFav=$('onlyFavorites').checked;
+ const shown=catalog.channels.filter(c=>(!search||c.name.toLocaleLowerCase('tr-TR').includes(search))&&(!category||channelCategories(c).includes(category))&&(!onlyFav||favorites.has(c.id)));
+ for(const c of shown){const row=document.createElement('div');row.className='entry';const b=document.createElement('button');b.type='button';b.textContent=c.name;b.dataset.id=c.id;b.classList.toggle('active',c.id===selected);b.setAttribute('aria-pressed',String(c.id===selected));b.addEventListener('click',()=>choose(c));row.append(b);
+ const fav=document.createElement('button');fav.type='button';fav.className='fav';fav.textContent=favorites.has(c.id)?'★':'☆';fav.title=favorites.has(c.id)?'Favoriden çıkar':'Favorilere ekle';fav.setAttribute('aria-label',`${c.name}: ${fav.title}`);fav.setAttribute('aria-pressed',String(favorites.has(c.id)));fav.addEventListener('click',()=>{if(favorites.has(c.id))favorites.delete(c.id);else favorites.add(c.id);renderChannels(selectedChannelId);storeFavorites().catch(()=>{$('updateStatus').textContent='Favori kaydedilemedi · Bu oturum için etkin'})});row.append(fav);nav.append(row)}
+ if(!shown.length){const empty=document.createElement('span');empty.className='empty-list';empty.textContent='Eşleşen kanal yok';nav.append(empty)}$('channelCount').textContent=`${shown.length} / ${catalog.channels.length} test kanalı`;
+}
+$('search').addEventListener('input',()=>renderChannels(selectedChannelId));$('category').addEventListener('change',()=>renderChannels(selectedChannelId));$('onlyFavorites').addEventListener('change',()=>renderChannels(selectedChannelId));
+function showCover(title,detail='Oynatma doğrulanıyor…'){$('coverTitle').textContent=title;$('coverDetail').textContent=detail;cover.hidden=false}
+function hostSend(data){try{nativeTransport?.send(JSON.stringify({protocol:'sefaxtv-probe-v1',...data}));return !!nativeTransport}catch{return false}}
+function clearAttempt(s){clearTimeout(s.timer);clearTimeout(s.statusTimer);clearInterval(s.monitor);s.timer=s.statusTimer=s.monitor=null;if(s.native&&s.token)hostSend({type:'probe:stop',seq:s.seq,token:s.token});s.frame?.remove();s.frame=null;s.native=false;s.source=null;s.token=null;}
+function stop(){const a=active;active=null;if(a)clearAttempt(a);$('moreSources').hidden=true}
+function showIdle(){stop();showCover('HAZIR','İzlemek için bir kanal seç.');$('status').textContent='Kanal seçimi bekleniyor';$('badge').textContent='HAZIR';delete screen.dataset.source;}
+function currentAttempt(s,seq,token){return active===s&&s.seq===seq&&s.token===token&&!!s.frame&&!!s.source}
+function armDeadline(s){clearTimeout(s.timer);clearTimeout(s.statusTimer);const {seq,token}=s;if(document.hidden)return;
+ s.statusTimer=setTimeout(()=>{if(currentAttempt(s,seq,token)&&!s.done&&!s.playing)showCover('Bağlantı bekleniyor','Gerçek oynatma kanıtı henüz alınmadı.');},STATUS_MS);
+ s.timer=setTimeout(()=>{if(!currentAttempt(s,seq,token)||s.playing||s.done||document.hidden)return;s.done=true;const source=s.source;void remember(source,'unknown').then(()=>{if(currentAttempt(s,seq,token))tryNext(s)});},TIMEOUT_MS);
+}
+
+function makePlayer(mode,token,seq){const js=`
+ const mode=${JSON.stringify(mode)},token=${JSON.stringify(token)},seq=${JSON.stringify(seq)};
+ const notify=(type,data={})=>parent.postMessage({kind:'tv-lab-v05',token,seq,type,contentId:mode,...data},${JSON.stringify(location.origin==='null'?'*':location.origin)});
+ if(mode==='fail')notify('fatal',{reason:'lab-fixed-error'});
+ else if(mode==='ready')notify('ready');
+ else{
+  const canvas=document.createElement('canvas');canvas.width=960;canvas.height=540;
+  const ctx=canvas.getContext('2d'),video=document.querySelector('video');let frozen=false;
+  function paint(){if(frozen)return;const t=Date.now()/1000,w=canvas.width,h=canvas.height;ctx.fillStyle='#08162e';ctx.fillRect(0,0,w,h);
+   for(let i=0;i<9;i++){ctx.fillStyle='hsl('+((i*38+t*28)%360)+' 70% 53%)';ctx.fillRect((i*105+(t*38)%105)-105,0,76,h)}
+   ctx.fillStyle='rgba(0,0,0,.72)';ctx.fillRect(180,195,600,145);ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font='bold 46px system-ui';ctx.fillText('TEST GÖRÜNTÜSÜ',480,250);ctx.font='26px monospace';ctx.fillText(new Date().toLocaleTimeString('tr-TR'),480,306);requestAnimationFrame(paint)}
+  paint();video.srcObject=canvas.captureStream(12);video.play().then(()=>{
+   if(typeof video.requestVideoFrameCallback!=='function'){notify('unknown');return}let count=0,last=-1,lastSent=0,first=NaN,proved=false;
+   function onFrame(now,meta){
+    if(frozen)return;
+    if(Number.isFinite(meta.mediaTime)&&meta.mediaTime>last&&meta.presentedFrames>0){last=meta.mediaTime;count++;
+     if(!Number.isFinite(first))first=last;
+     if(!proved&&count>=2&&last-first>=0.16){proved=true;notify('proof',{frames:count,mediaTime:last});lastSent=now}
+     else if(proved&&now-lastSent>=900){notify('progress',{frames:count,mediaTime:last});lastSent=now}
+     if(mode==='stall'&&count>=15){frozen=true;video.srcObject?.getTracks().forEach(t=>t.stop());return}
+    }
+    video.requestVideoFrameCallback(onFrame)
+   }video.requestVideoFrameCallback(onFrame)
+  }).catch(()=>notify('blocked'));
+ }`;
+ return '<!doctype html><html lang="tr"><head><meta charset="utf-8"><style>html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#030711}video{width:100%;height:100%;object-fit:cover;display:block}</style></head><body><video autoplay muted playsinline></video><scr'+'ipt>'+js+'</scr'+'ipt></body></html>';
+}
+function endSession(s,title='Yayın doğrulanamadı',detail='Güvenilir oynatma kanıtı alınamadı.'){
+ if(active!==s)return;clearAttempt(s);s.playing=false;
+ $('moreSources').hidden=true;showCover(title,detail);$('status').textContent='Kapak kapalı · Yayın doğrulanamadı';$('badge').textContent='KAPALI';
+}
+function tryNext(s){
+ if(active!==s)return;clearAttempt(s);s.playing=false;s.done=false;
+ $('moreSources').hidden=true;
+ if(s.index>=s.sources.length){endSession(s);return}
+ if(s.attempts>=MAX_ATTEMPTS){endSession(s,'Deneme sınırı doldu','Üç aday denendi; kalan kaynakları elle deneyebilirsin.');$('moreSources').hidden=s.index>=s.sources.length;return}
+ if(!navigator.onLine){endSession(s,'Bağlantı bekleniyor','İnternet yokken kaynaklar cezalandırılmaz.');return}
+ const source=s.sources[s.index++];s.attempts++;
+ if(!sourceAllowed(source)){tryNext(s);return}
+ const seq=++serial;const token=Array.from(crypto.getRandomValues(new Uint8Array(16)),x=>x.toString(16).padStart(2,'0')).join('');
+ const frame=document.createElement('iframe');const isNative=source.provider==='native-lab';frame.title='İzinli laboratuvar test oynatıcısı';frame.allow='autoplay';frame.referrerPolicy='no-referrer';
+ s.seq=seq;s.source=source;s.token=token;s.frame=frame;s.native=isNative;s.loaded=false;s.pendingProof=null;s.nativeCount=0;s.done=false;s.start=performance.now();s.playing=false;s.lastFrames=0;s.lastMediaTime=-1;s.proofAt=0;
+ screen.dataset.source=source.id;frame.addEventListener('load',()=>{if(!currentAttempt(s,seq,token))return;if(s.loaded){endSession(s,'Oynatıcı yeniden yüklendi','Yeni oynatma kanıtı için kanalı tekrar seç.');return;}s.loaded=true;if(s.pendingProof){const p=s.pendingProof;s.pendingProof=null;acceptProof(s,p);}});
+ if(isNative){const url=new URL(NATIVE_PLAYER);url.hash=new URLSearchParams({seq:String(seq),token,mode:source.contentId}).toString();s.nativeUrl=url.href;
+  if(!hostSend({type:'probe:start',seq,token,url:s.nativeUrl})){endSession(s,'Native köprü yok');return;}frame.src=s.nativeUrl;
+ }else{frame.sandbox=FRAME_ADAPTERS.lab.sandbox;frame.srcdoc=makePlayer(labMode(source),token,seq);}
+ screen.insertBefore(frame,cover);showCover('Yayın hazırlanıyor');$('status').textContent='Oynatma kanıtı bekleniyor…';$('badge').textContent='KONTROL';armDeadline(s);
+}
+function choose(ch){stop();renderChannels(ch.id);showCover('Yayın hazırlanıyor','Kaynaklar sıralanıyor…');$('badge').textContent='KONTROL';
+ const s={channel:ch,sources:rank(ch.sources).slice(0,MAX_SOURCES),index:0,attempts:0,frame:null,timer:null,monitor:null,done:false,playing:false,lastFrames:0,lastMediaTime:-1,proofAt:0};active=s;tryNext(s);
+}
+function mediaProgress(s,frames,mediaTime){
+ if(!Number.isSafeInteger(frames)||frames<2||frames>1e9||!Number.isFinite(mediaTime)||mediaTime<=0||mediaTime>1e9)return false;
+ if(frames<=s.lastFrames||mediaTime<=s.lastMediaTime)return false;
+ s.lastFrames=frames;s.lastMediaTime=mediaTime;s.proofAt=performance.now();return true;
+}
+function startWatchdog(s){
+ clearInterval(s.monitor);s.monitor=setInterval(()=>{
+  if(active!==s||!s.playing)return;
+  if(document.hidden||!navigator.onLine){s.proofAt=performance.now();return}
+  if(performance.now()-s.proofAt<STALL_MS)return;
+  clearInterval(s.monitor);s.playing=false;s.done=true;cover.hidden=false;
+  showCover('Yedek aranıyor','Kare ilerlemesi durdu; kaynak doğrulanamadı.');$('status').textContent='Yayın durdu · Yedek aranıyor';
+  const token=s.token,source=s.source;
+  // Donma bilinmeyen durumdur: kesin hata yazılmaz, doğrulanmış eski başarı korunur.
+  void remember(source,'unknown').then(()=>{if(active===s&&s.token===token)tryNext(s)});
+ },HEARTBEAT_TICK_MS)
+}
+function acceptProof(s,d){
+ if(active!==s||s.done||s.playing||document.hidden)return false;
+ if(!s.loaded){s.pendingProof=d;return false;}
+ if(!mediaProgress(s,d.frames,d.mediaTime))return false;
+ s.playing=true;clearTimeout(s.timer);clearTimeout(s.statusTimer);cover.hidden=true;
+ $('status').textContent=s.native?'Native video ilerlemesi doğrulandı · İzleniyor':'Video kareleri doğrulandı · İzleniyor';$('badge').textContent='YAYIN VAR';
+ startWatchdog(s);void remember(s.source,'success',performance.now()-s.start);return true;
+}
+function receiveNative(raw){
+ if(!nativeTransport||typeof raw!=='string'||raw.length>2048)return;
+ let d;try{d=JSON.parse(raw)}catch{return}if(d?.protocol!=='sefaxtv-probe-v1')return;
+ if(d.type==='host:ready'&&d.fixture===NATIVE_PLAYER){nativeReady=true;$('nativeLab').hidden=false;$('bridgeInfo').textContent=`Native LAB köprüsü: ${nativeTransport.kind} · Hazır`;return;}
+ const s=active;if(!s?.native||!currentAttempt(s,d.seq,d.token)||d.url!==s.nativeUrl||d.type!=='video:advanced'||s.done||document.hidden)return;
+ // Host must bind proof to the actual current live frame and independently validate its origin/path.
+ if(!Number.isSafeInteger(d.counter)||d.counter<=s.nativeCount||d.counter>=1e9||!Number.isFinite(d.mediaTime)||d.mediaTime<=0||d.mediaTime>1e9)return;
+ if(d.method==='frames'){if(!Number.isSafeInteger(d.frameDelta)||d.frameDelta<1||!Number.isFinite(d.delta)||d.delta<0.16)return;}
+ else if(d.method==='time'){if(!Number.isFinite(d.delta)||d.delta<0.25)return;}else return;
+ // Use a monotonic evidence count across both detectors; never use frame-load as proof.
+ const p={frames:d.counter+1,mediaTime:d.mediaTime};if(p.mediaTime<=s.lastMediaTime)return;s.nativeCount=d.counter;
+ if(s.playing)mediaProgress(s,p.frames,p.mediaTime);else acceptProof(s,p);
+}
+$('bridgeInfo').textContent=nativeTransport?'Native kabuk yanıtı bekleniyor · Yoksa web LAB':'Web modu · Native gözlemci yok';
+if(nativeTransport){try{nativeTransport.listen(receiveNative);hostSend({type:'host:hello'});}catch{nativeReady=false;}}
+// Android LAB: the trusted, packaged parent checks the actual WindowProxy and local URL.
+window.addEventListener('message',event=>{
+ const s=active,d=event.data;
+ if(nativeTransport?.kind!=='android'||!nativeReady||!s?.native||s.done||document.hidden||event.origin!==new URL(NATIVE_PLAYER).origin||event.source!==s.frame?.contentWindow||!d||d.protocol!=='sefaxtv-probe-v1'||d.type!=='video:advanced'||!currentAttempt(s,d.seq,d.token)||d.url!==s.nativeUrl)return;
+ try{if(s.frame.contentWindow.location.href!==s.nativeUrl)return;}catch{return;}
+ // The host independently validates the active session and evidence before echoing it.
+ hostSend({type:'probe:evidence',evidence:d});
+});
+window.addEventListener('message',event=>{
+ const s=active,d=event.data;
+ if(!s||s.native||s.done||document.hidden||!d||d.seq!==s.seq||d.kind!=='tv-lab-v05'||event.source!==s.frame?.contentWindow||d.token!==s.token||d.contentId!==labMode(s.source)||event.origin!==FRAME_ADAPTERS.lab.origin)return;
+ // 'null' yalnız sandbox allow-scripts srcdoc kaynaklı BİZİM LAB testine özeldir. Dış iframe için güvenilir köken, izin ve API şarttır.
+ if(d.type==='ready')return;
+ if(d.type==='blocked'&&!s.playing&&!s.done){s.done=true;clearTimeout(s.timer);endSession(s,'Oynatma izni gerekli','Tarayıcı otomatik oynatmayı engelledi.');return}
+ if(d.type==='fatal'&&d.reason==='lab-fixed-error'&&!s.playing&&!s.done){
+  s.done=true;clearTimeout(s.timer);const source=s.source,token=s.token;
+  if(!navigator.onLine){endSession(s,'Bağlantı bekleniyor','İnternet bağlantısı kesildi.');return}
+  void remember(source,'failure').then(()=>{if(active===s&&s.token===token)tryNext(s)});return;
+ }
+ if(d.type==='proof'){acceptProof(s,d);return;}
+ if(d.type==='progress'){if(s.playing)mediaProgress(s,d.frames,d.mediaTime);else acceptProof(s,d);return;}
+});
+window.addEventListener('offline',()=>{if(active){endSession(active,'Bağlantı bekleniyor','İnternet kesildi; kaynaklara ceza verilmedi.')}});
+document.addEventListener('visibilitychange',()=>{const s=active;if(!s)return;
+ if(document.hidden){clearTimeout(s.timer);clearTimeout(s.statusTimer);s.timer=s.statusTimer=null;s.proofAt=performance.now();s.pendingProof=null;return}
+ s.proofAt=performance.now();if(s.playing)return;if(s.frame&&!s.done)armDeadline(s);
+});
+$('nativeLab').addEventListener('click',()=>{if(!nativeReady)return;choose({id:'native-lab-demo',name:'Native LAB',categoryIds:['test'],sources:[{id:'native-stall',provider:'native-lab',permissionId:'lab-internal',contentId:'stall',revision:1,priority:1,enabled:true},{id:'native-play',provider:'native-lab',permissionId:'lab-internal',contentId:'play',revision:1,priority:2,enabled:true}]});});
+$('moreSources').addEventListener('click',()=>{const s=active;if(!s||s.source||s.index>=s.sources.length)return;s.attempts=0;tryNext(s)});
+$('labStall').addEventListener('click',()=>{
+ const s1={id:'lab-stall-test',provider:'lab',permissionId:'lab-internal',contentId:'stall',revision:1,priority:1,enabled:true};
+ const s2={id:'lab-stall-backup',provider:'lab',permissionId:'lab-internal',contentId:'play',revision:1,priority:2,enabled:true};
+ choose({id:'lab-stall-demo',name:'Donma → yedek laboratuvarı',categoryIds:['test'],sources:[s1,s2]});
+});
+function decodeB64(str){if(typeof str!=='string'||!/^[A-Za-z0-9_-]+$/.test(str))throw Error('Base64url geçersiz');const s=str.replace(/-/g,'+').replace(/_/g,'/');const b=atob(s+'='.repeat((4-s.length%4)%4));const canonical=btoa(b).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');if(canonical!==str)throw Error('Base64url standart dışı');return Uint8Array.from(b,c=>c.charCodeAt(0))}
+function bytesToHex(a){return Array.from(a,x=>x.toString(16).padStart(2,'0')).join('')}
+async function verifyEnvelope(envelope){
+ if(!crypto?.subtle)throw Error('Bu tarayıcıda kriptografik doğrulama yok');
+ if(!envelope||typeof envelope.keyId!=='string'||!Object.hasOwn(TRUSTED_PUBLIC_KEYS,envelope.keyId)||Object.keys(envelope).sort().join(',')!=='keyId,payload,signature')throw Error('Bilinmeyen veya geçersiz imza zarfı');
+ const payload=decodeB64(envelope.payload),sig=decodeB64(envelope.signature);
+ if(sig.length!==64||payload.length>2048)throw Error('İmza boyutu geçersiz');
+ const key=await crypto.subtle.importKey('jwk',TRUSTED_PUBLIC_KEYS[envelope.keyId],{name:'ECDSA',namedCurve:'P-256'},false,['verify']);
+ if(!await crypto.subtle.verify({name:'ECDSA',hash:'SHA-256'},key,sig,payload))throw Error('İmza geçersiz');
+ const manifest=JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(payload));
+ if(Object.keys(manifest).sort().join(',')!=='catalogSha256,minClientBuild,publishedAt,schemaVersion,version'||manifest.schemaVersion!==1||!Number.isSafeInteger(manifest.version)||manifest.version<1||manifest.version>1000000||!Number.isSafeInteger(manifest.minClientBuild)||manifest.minClientBuild<1||manifest.minClientBuild>CLIENT_BUILD||!/^([a-f0-9]{64})$/.test(manifest.catalogSha256)||Number.isNaN(Date.parse(manifest.publishedAt)))throw Error('Manifest geçersiz');
+ return manifest;
+}
+async function verifyPackage(envelope,catalogBytes){
+ const manifest=await verifyEnvelope(envelope);
+ if(catalogBytes.length>2*1024*1024)throw Error('Katalog çok büyük');
+ const hash=bytesToHex(new Uint8Array(await crypto.subtle.digest('SHA-256',catalogBytes)));
+ if(hash!==manifest.catalogSha256)throw Error('Katalog özeti uyuşmuyor');
+ const item=JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(catalogBytes));
+ if(!validateCatalog(item)||item.version!==manifest.version)throw Error('Katalog şeması geçersiz');
+ return {item,hash,manifest};
+}
+// GitHub Pages proje sitesi. Kamuya açık tek köken: test yayını, parola veya özel anahtar bulunmaz.
+const PUBLIC_ROOT='https://sedathut-sys.github.io/sefaxtv/';
+function getBase(){
+ if(location.hostname==='sedathut-sys.github.io'&&location.pathname.startsWith('/sefaxtv/'))return new URL('/sefaxtv/',location.href).href;
+ // Yalnız yerel laboratuvarda aynı-kökenli HTTP sunucusu kullanılır.
+ if(['localhost','127.0.0.1'].includes(location.hostname)&&['http:','https:'].includes(location.protocol))return new URL('./',location.href).href;
+ return PUBLIC_ROOT;
+}
+async function safeBytes(response,limit){
+ if(!response.ok)throw Error('İstek başarısız: '+response.status);
+ const type=response.headers.get('content-type')||'';
+ if(!/json|octet-stream|text\/plain/i.test(type))throw Error('Sunucu JSON dışı içerik verdi');
+ const size=Number(response.headers.get('content-length'));
+ if(size>limit)throw Error('Paket sınırdan büyük');
+ const reader=response.body?.getReader();
+ if(!reader){const b=new Uint8Array(await response.arrayBuffer());if(b.length>limit)throw Error('Paket sınırdan büyük');return b}
+ const arr=[];let total=0;
+ for(;;){const {done,value}=await reader.read();if(done)break;total+=value.byteLength;
+  if(total>limit){await reader.cancel();throw Error('Paket sınırdan büyük')}
+  arr.push(value)}
+ const all=new Uint8Array(total);let pos=0;for(const x of arr){all.set(x,pos);pos+=x.byteLength}return all;
+}
+async function safeFetch(url,limit){
+ const ctl=new AbortController();const timer=setTimeout(()=>ctl.abort(),10000);
+ try{const res=await fetch(url,{cache:'no-store',redirect:'error',credentials:'omit',mode:'cors',signal:ctl.signal});return await safeBytes(res,limit)}
+ finally{clearTimeout(timer)}
+}
+async function getUpdatePacket(){
+ const base=getBase();const latest=new URL('catalog/latest.json',base);
+ const envelopeBytes=await safeFetch(latest,8192);
+ const envelope=JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(envelopeBytes));
+ // Önce imza doğrulanır. Sürüm, doğrulanmamış JSON'dan seçilmez.
+ const manifest=await verifyEnvelope(envelope);
+ if(manifest.version>1000000)throw Error('Sürüm çok yüksek');
+ if(manifest.version<state.highWater)throw Error('Daha eski sürüm reddedildi');
+ const source=new URL('catalog/v'+manifest.version+'.json',base);
+ const bytes=await safeFetch(source,2*1024*1024);
+ return {envelope,catalogBytes:bytes,kind:'HTTPS imzalı paket',base};
+}
+function getLabPacket(){return {envelope:LAB_ENVELOPE,catalogBytes:new TextEncoder().encode(LAB_CATALOG_TEXT),kind:'gömülü imzalı LAB paketi'};}
+function installCatalog(item,hash){return new Promise((resolve,reject)=>{
+ if(!durable){reject(Error('IndexedDB olmadan güncelleme kalıcı değildir'));return}
+ const tx=db.transaction(['catalogs','meta'],'readwrite'),meta=tx.objectStore('meta'),cats=tx.objectStore('catalogs');let result=null,error=null;
+ const req=meta.get('catalog');req.onsuccess=()=>{
+  const old=req.result;if(!old){error=Error('Katalog işaretçisi yok');tx.abort();return}
+  if(item.version<old.highWater){error=Error('Eski sürüme dönmek yasak');tx.abort();return}
+  if(item.version===old.active){
+   if(old.hash&&old.hash!==hash){error=Error('Aynı sürüm için farklı katalog');tx.abort();return}
+   result='same';return;
+  }
+  if(item.version===old.highWater){error=Error('Daha önce kullanılan sürüm geri döndürülemez');tx.abort();return}
+  cats.put(item);meta.put({id:'catalog',active:item.version,previous:old.active,highWater:item.version,hash});
+  result='updated';
+ };
+ tx.oncomplete=()=>resolve(result);tx.onerror=()=>reject(error||tx.error);tx.onabort=()=>reject(error||tx.error||Error('Güncelleme iptal edildi'));
+})}
+async function updateCatalog(localOnly=false){if(working)return;working=true;$('update').disabled=true;$('updateStatus').textContent='İmzalı paket kontrol ediliyor…';
+ try{
+  const data=localOnly?getLabPacket():await getUpdatePacket();
+  const {item,hash}=await verifyPackage(data.envelope,data.catalogBytes);
+  if(item.version<state.highWater)throw Error('Daha eski sürüm reddedildi');
+  const result=await installCatalog(item,hash);
+  if(result==='updated'){
+   state=await readStore('meta','catalog');catalog=item;const oldId=active?.channel?.id;
+   const selected=catalog.channels.find(c=>c.id===oldId)||catalog.channels[0];
+   const playingSource=active?.source;const stillAllowed=playingSource&&selected?.sources.some(x=>x.id===playingSource.id&&x.revision===playingSource.revision&&x.enabled&&sourceAllowed(x));renderChannels(selected?.id||null);if(!stillAllowed)showIdle();else {const a=active;const attempted=new Set(a.sources.slice(0,a.index).map(x=>x.id));a.channel=selected;a.sources=[playingSource,...rank(selected.sources).filter(x=>!attempted.has(x.id))];a.index=1;}if(!selected)showCover('Katalog boş','Yayınlanmış kanal yok.');
+   $('updateStatus').textContent=`Katalog v${item.version} yüklendi · ${data.kind}`;
+  }else $('updateStatus').textContent=`Katalog v${item.version} zaten güncel · ${data.kind}`;
+  refreshInfo();
+ }catch(e){$('updateStatus').textContent='Güncelleme yapılmadı: '+e.message}
+ finally{working=false;$('update').disabled=false}
+}
+async function resetLab(){stop();memory.clear();favorites.clear();
+ if(durable){await new Promise((resolve,reject)=>{const tx=db.transaction(['history','catalogs','meta','profile'],'readwrite');tx.objectStore('profile').clear();tx.objectStore('history').clear();tx.objectStore('catalogs').clear();tx.objectStore('catalogs').put(INITIAL);tx.objectStore('meta').put({id:'catalog',active:1,previous:null,highWater:1,hash:null});tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)})}
+ state={id:'catalog',active:1,previous:null,highWater:1,hash:null};catalog=INITIAL;renderChannels(catalog.channels[0].id);$('updateStatus').textContent='Test verileri sıfırlandı · Katalog v1';refreshInfo();showIdle();
+}
+$('update').addEventListener('click',()=>updateCatalog(false));
+$('demoUpdate').addEventListener('click',()=>{if(state.highWater>3){$('updateStatus').textContent='Bu eski LAB v3 örneği etkin v4 sürümünden düşük; güvenle reddedildi.';return}updateCatalog(true)});
+$('remoteInfo').textContent='Katalog yayın adresi: '+getBase();
+$('reset').addEventListener('click',()=>resetLab().catch(e=>$('updateStatus').textContent=e.message));
+(async()=>{
+ try{db=await openDB();durable=true;await loadData();}
+ catch(e){durable=false;catalog=INITIAL;$('updateStatus').textContent='Yerel veritabanı erişimi yok · Güncelleme kaydedilemez';}
+ setupDone=true;renderChannels(catalog.channels[0]?.id||null);refreshInfo();
+ if(durable)$('updateStatus').textContent=`Katalog v${catalog.version} · Güncelle yalnız düğmeyle · GitHub Pages`;
+ if(catalog.channels.length)showIdle();else showCover('Katalog boş','Yayınlanmış kanal yok.');
+})();
+</script></body></html>
