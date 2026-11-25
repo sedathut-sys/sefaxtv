@@ -1,0 +1,30 @@
+name: SefaXTV Windows LAB 0.13
+on:
+  push:
+    branches: [lab/sefaxtv-windows-v013]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  windows-build:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: windows
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Session and frame identity tests
+        run: dotnet run --project tests/GateTests.csproj --configuration Release
+      - name: Publish Windows x64 LAB executable
+        run: dotnet publish SefaXTV.WindowsLab.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -o publish
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SefaXTV-0.13-Windows-LAB-x64
+          path: windows/publish/
+          retention-days: 7
