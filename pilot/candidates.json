@@ -1,0 +1,77 @@
+[
+  {
+    "id": "wsbn-24-7",
+    "name": "WSBN TV Channel 1",
+    "kind": "sports",
+    "schedule": "24/7 programming advertised",
+    "officialPage": "https://www.wsbn.tv/wsbn-tv-station/",
+    "evidence": [
+      "https://www.wsbn.tv/wsbn-tv-schedule/",
+      "https://www.wsbn.tv/terms/"
+    ],
+    "decision": "permission-needed",
+    "note": "Offer to teams/leagues/associations; SefaXTV embedding, temporary cover, and native observation not verified.",
+    "approval": null
+  },
+  {
+    "id": "chess-com",
+    "name": "Chess.com official streams",
+    "kind": "sports",
+    "schedule": "live events; continuous single channel not confirmed",
+    "officialPage": "https://www.chess.com/article/view/how-to-embed-share-chess-media",
+    "evidence": [
+      "https://dev.twitch.tv/docs/embed/"
+    ],
+    "decision": "incompatible-cover",
+    "note": "Official Twitch embeds are offered; Twitch prohibits obscuring the player.",
+    "approval": null
+  },
+  {
+    "id": "aspor",
+    "name": "A Spor",
+    "kind": "sports",
+    "schedule": "official live page; uninterrupted web playback not checked",
+    "officialPage": "https://www.aspor.com.tr/video/canli-yayin",
+    "evidence": [
+      "https://www.aspor.com.tr/hakkimizda"
+    ],
+    "decision": "permission-needed",
+    "note": "Official viewing page does not establish third-party player-only embedding rights.",
+    "approval": null
+  },
+  {
+    "id": "trtspor",
+    "name": "TRT Spor",
+    "kind": "sports",
+    "schedule": "linear TV; uninterrupted web playback not checked",
+    "officialPage": "https://www.trtspor.com.tr/kullanim-sartlari",
+    "evidence": [],
+    "decision": "permission-needed",
+    "note": "Terms do not establish required embedding and cover rights.",
+    "approval": null
+  },
+  {
+    "id": "uefatv",
+    "name": "UEFA.tv",
+    "kind": "sports",
+    "schedule": "scheduled live events, not linear 24/7",
+    "officialPage": "https://www.uefa.com/uefatv-faq/",
+    "evidence": [
+      "https://www.uefa.com/news-media/news/0296-1cfdb40174a1-822e740edc95-1000--uefa-tv-terms-and-conditions/"
+    ],
+    "decision": "out-of-scope",
+    "note": "Territorial/contractual conditions; no compatible third-party embed approval.",
+    "approval": null
+  },
+  {
+    "id": "un-webtv",
+    "name": "UN Web TV",
+    "kind": "tv",
+    "schedule": "scheduled live events and archives",
+    "officialPage": "https://www.un.org/en/node/205121",
+    "evidence": [],
+    "decision": "technical-review",
+    "note": "Event embed codes explicitly offered; exact current player, temporary cover and proof remain unverified.",
+    "approval": null
+  }
+]
