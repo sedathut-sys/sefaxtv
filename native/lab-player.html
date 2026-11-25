@@ -1,0 +1,9 @@
+<!doctype html><html lang="tr"><meta charset="utf-8"><title>SefaXTV native LAB</title><style>html,body,video{width:100%;height:100%;margin:0;background:#101b2b;display:block}video{object-fit:contain}</style><video muted autoplay playsinline></video><script>
+'use strict';
+const mode=new URLSearchParams(location.hash.slice(1)).get('mode');
+if(['play','stall'].includes(mode)){
+ const c=document.createElement('canvas');c.width=640;c.height=360;const ctx=c.getContext('2d'),v=document.querySelector('video');let running=true;
+ function draw(){if(!running)return;ctx.fillStyle='#102039';ctx.fillRect(0,0,640,360);ctx.fillStyle='#58c1ed';ctx.fillRect((Date.now()/10)%560,40,80,70);ctx.fillStyle='#fff';ctx.font='28px system-ui';ctx.fillText('SEFAXTV · NATIVE LAB',100,190);ctx.fillText(new Date().toLocaleTimeString('tr-TR'),200,230);requestAnimationFrame(draw);}
+ draw();v.srcObject=c.captureStream(12);v.play().catch(()=>{});if(mode==='stall')setTimeout(()=>{running=false;v.srcObject.getTracks().forEach(t=>t.stop());},1800);
+}
+</script></html>
