@@ -1,0 +1,65 @@
+[
+  {
+    "id": "cbs-golazo",
+    "name": "CBS Sports Golazo Network",
+    "schedule": "24/7 football",
+    "evidence": "https://www.paramountpressexpress.com/paramount-plus/releases/?view=101931-cbs-sports-golazo-network-a-first-of-its-kind-free-247-streaming-network-in-the-us-dedicated-to-global-soccer-to-launch-april-11",
+    "reason": "US scope; no general embed/cover grant established.",
+    "decision": "not-approved",
+    "approval": null
+  },
+  {
+    "id": "redbull-tv",
+    "name": "Red Bull TV",
+    "schedule": "24/7 plus event coverage",
+    "evidence": "https://apps.apple.com/us/app/red-bull-tv-watch-live-events-app/id364269164",
+    "reason": "Official distribution app; no third-party player-only embedding and cover grant established.",
+    "decision": "not-approved",
+    "approval": null
+  },
+  {
+    "id": "sportplus",
+    "name": "CANAL+ SPORT+",
+    "schedule": "24h sports",
+    "evidence": "https://canal-assistance.canalplus.com/fr/articles/chaines/sport-tout-savoir-sur-lexprience-sport-de-canal/6accfc02decede6a67ad401a",
+    "reason": "Free programming does not establish Türkiye or embedding rights.",
+    "decision": "not-approved",
+    "approval": null
+  },
+  {
+    "id": "aci-sport",
+    "name": "ACI Sport TV",
+    "schedule": "linear motorsport and live events",
+    "evidence": "https://www.aci.it/motorsport/aci-sport-tv/",
+    "reason": "Official channel and web streaming; permission for third-party iframe not established.",
+    "decision": "not-approved",
+    "approval": null
+  },
+  {
+    "id": "scorebat",
+    "name": "ScoreBat",
+    "schedule": "official football videos / not a linear 24h channel",
+    "evidence": "https://www.scorebat.com/video-widget/",
+    "reason": "Embed offered for video widget; continuous channel and permission for strict cover/player-only not established.",
+    "decision": "not-approved",
+    "approval": null
+  },
+  {
+    "id": "nasa",
+    "name": "NASA Live",
+    "schedule": "scheduled public-service TV programming",
+    "evidence": "https://www.nasa.gov/live/",
+    "reason": "NASA public media guidelines https://www.nasa.gov/nasa-brand-center/images-and-media/ do not alone approve every third-party streaming player or cover.",
+    "decision": "not-approved",
+    "approval": null
+  },
+  {
+    "id": "sport-video",
+    "name": "SPORT.VIDEO",
+    "schedule": "sports clips / platform",
+    "evidence": "https://product.sport.video/embed-showcase/",
+    "reason": "Embed offer is for own content; no suitable linear rights-holder channel established.",
+    "decision": "not-approved",
+    "approval": null
+  }
+]
