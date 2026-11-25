@@ -1,6 +1,6 @@
 # SefaXTV — Akıllı Web TV
 
-**İzleyici: 0.10 · güncel imzalı katalog: v4 (6 laboratuvar kanalı / 25 kaynak).**
+**İzleyici: 0.11 · güncel imzalı katalog: v4 (6 laboratuvar kanalı / 25 kaynak).**
 
 Kamusal GitHub Pages: https://sedathut-sys.github.io/sefaxtv/
 
@@ -8,7 +8,7 @@ Bu bir test prototipidir. Tüm kaynaklar kendi oluşturduğumuz `lab` görüntü
 
 ## Güven zinciri
 
-- `index.html`: tek HTML izleyici, `CLIENT_BUILD=10`, eski `tv-lab-05` ile yeni `sefaxtv-7777dfd54f34cab3209c0080` **açık** anahtarlarını tanır.
+- `index.html`: tek HTML izleyici, `CLIENT_BUILD=11`, eski `tv-lab-05` ile yeni `sefaxtv-7777dfd54f34cab3209c0080` **açık** anahtarlarını tanır.
 - `catalog/latest.json`: P-256 ECDSA/SHA-256 imzalı, **v4** manifesti.
 - `catalog/v4.json`: SHA-256 özeti manifestte sabitlenmiş, altıncı kanalı ekleyen tam katalog.
 - `catalog/v3.json`: geriye uyumluluk için saklanan önceki doğrulanmış katalog.
@@ -45,3 +45,12 @@ GitHub'a yükleme/yayın yetkisi izleyici kodunda yoktur. Yönetici taslağını
 ## İleride yeni katalog sürümü
 
 Yönetici, **aynı yerel imza anahtarının güvenli yedeğini** kullanarak monoton artan sürüm numarasıyla yeni paket imzalar. Önce yeni sürümlü katalog yüklenip doğrulanır; en son imzalı `latest.json` değiştirilir. Daha düşük sürüme dönülmez.
+
+## 0.11 — SeFaSportsTV gözlemci köprüsü
+
+- Önceki DunyaTV Android/Windows referans dalları yalnız okunmuştur. Hiçbir eski sağlayıcı adresi yeni aktif kataloğa eklenmedi.
+- Kanal seçilmeden iframe oluşturulmaz. Katalog Güncelle işlemi kendi başına yayın başlatmaz. Her aday için yeni sıra numarası ve 128 bit oturum anahtarı; eski frame ve yanlış köken/oturum mesajı reddedilir.
+- 6,5 sn yalnız durum değişimi; 10 sn ayrı belirsiz aday süresi; en çok üç aday/tur. 8 sn donmada otomatik yedek. Bilinmeyen sonuç başarı/hata sayılmaz; kısa tekrar beklemesi kaydedilir.
+- Web LAB video kareleri; native LAB için 0,16 sn kare veya 0,25 sn zaman ilerlemesi ve sürekli heartbeat. Native taşıyıcı yalnız tam paketlenmiş yerel ana belge URL'sinde açılır; halka açık site native mod değildir.
+- [Native LAB protokolü](native/PROTOCOL.md), [gözlemci referansı](native/observer.js) ve [kendi test oynatıcımız](native/lab-player.html). Bunlar henüz APK/EXE veya gerçek native host entegrasyonu değildir. Harici iframe sağlayıcısı etkin değildir.
+- Chromium gerçek LAB görüntüsü, hata/donma yedeği, eski/yanlış köken mesajı reddi; native taşıyıcı taklidi ve Node VM gözlemci testleri geçti. Gerçek cihaz/WebView ve canlı site IndexedDB uçtan uca testi doğrulanmadı. İmzalı v4 katalog ve manifest değişmedi.
