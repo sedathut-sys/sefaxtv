@@ -1,0 +1,32 @@
+name: SefaXTV 0.25 smart viewer and single live candidate
+on:
+  push:
+    branches: ['lab/sefaxtv-pilot-v025']
+    paths: ['pilot025/**', '.github/workflows/pilot-025.yml']
+permissions:
+  contents: read
+concurrency:
+  group: sefaxtv-external-single-probe
+  cancel-in-progress: false
+jobs:
+  viewer:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-save --package-lock=false jschannel@1.0.2 esbuild@0.25.5
+      - run: ./node_modules/.bin/esbuild pilot025/vendor-entry.mjs --bundle --platform=browser --format=esm --outfile=pilot025/vendor/channel.mjs
+      - run: node pilot025/test-controller.mjs && node --check pilot025/viewer.mjs && node --check pilot025/live.js
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m py_compile pilot025/test_viewer.py pilot025/test_live.py
+      - run: python -m pip install playwright==1.52.0
+      - run: python -m playwright install --with-deps chromium
+      - run: python pilot025/test_viewer.py
+      - run: |
+          if ! command -v google-chrome >/dev/null; then python -m playwright install chrome; fi
+      - run: python pilot025/test_live.py
