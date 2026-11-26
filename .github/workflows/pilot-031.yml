@@ -1,0 +1,38 @@
+name: SefaXTV 0.31 paced dubbing and mux synchronization
+on:
+  push:
+    branches: ['lab/sefaxtv-pilot-v031']
+    paths: ['pilot031/**', '.github/workflows/pilot-031.yml']
+permissions:
+  contents: read
+jobs:
+  paced-dub:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-save --package-lock=false hls.js@1.6.13 esbuild@0.25.5
+      - run: ./node_modules/.bin/esbuild pilot026/vendor-entry.mjs --bundle --platform=browser --format=esm --outfile=pilot031/vendor/hls.mjs
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m py_compile pilot031/voice_worker.py pilot031/pipeline.py pilot031/verify.py pilot031/test_realtime.py && node --check pilot031/viewer.mjs
+      - run: sudo apt-get update && sudo apt-get install -y espeak-ng ffmpeg fonts-dejavu-core
+      - run: python -m pip install --index-url https://download.pytorch.org/whl/cpu torch==2.6.0
+      - run: python -m pip install -r pilot030/requirements.txt playwright==1.52.0
+      - run: |
+          if ! command -v google-chrome >/dev/null; then python -m playwright install --with-deps chrome; fi
+      - run: python pilot031/test_realtime.py
+        env:
+          OMP_NUM_THREADS: '2'
+          MKL_NUM_THREADS: '2'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pilot031-paced-evidence
+          path: pilot031-results/
+          if-no-files-found: ignore
+          retention-days: 7
