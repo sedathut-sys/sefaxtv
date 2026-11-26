@@ -1,0 +1,26 @@
+name: SefaXTV 0.21 bounded bridge local acceptance
+on:
+  push:
+    branches: ['lab/sefaxtv-pilot-v021']
+    paths: ['pilot021/**', '.github/workflows/pilot-021.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  local:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node pilot021/test-bridge.mjs
+      - run: node --check pilot021/diagnostic.mjs
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m py_compile pilot021/test_two_origins.py
+      - run: python -m pip install playwright==1.52.0
+      - run: python -m playwright install --with-deps chromium
+      - run: python pilot021/test_two_origins.py

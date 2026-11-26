@@ -1,0 +1,19 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Own loopback fixture</title></head><body><p>Own synthetic protocol fixture; no media</p><script type="module">
+const parentOrigin='http://127.0.0.1:18762',scope=new URL(location.href).searchParams.get('scope'),mode=new URL(location.href).searchParams.get('mode')||'notice';
+const post=m=>parent.postMessage(JSON.stringify(m),parentOrigin);
+const notify=(method,params)=>post({method:scope+'::'+method,params});
+let ready=false,queryCount=0,timer=null;
+function run(){if(timer)return;let p=0;timer=setInterval(()=>{p+=.5;notify('playbackStatusUpdate',{position:p,playbackState:'playing'});},500);}
+window.addEventListener('message',e=>{
+ if(e.origin!==parentOrigin||e.source!==parent||typeof e.data!=='string')return;
+ let m;try{m=JSON.parse(e.data);}catch{return;}
+ if(m.method===scope+'::__ready'&&m.params==='ping')notify('__ready','pong');
+ if(m.method===scope+'::isReady'){
+  queryCount++;post({id:m.id,result:mode==='reply'});
+  if(mode==='notice'&&!ready){setTimeout(()=>{ready=true;notify('ready',true);run();},400);}
+  if(mode==='reply'){ready=true;run();}
+  if(mode==='reject'){notify('ready',false);}
+ }
+});
+notify('__ready','ping');
+</script></body></html>

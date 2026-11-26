@@ -1,0 +1,23 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Own two-origin bridge harness</title></head><body><script type="module">
+import {Bridge} from './bridge.mjs';
+import {ProgressGate} from './progress.mjs';
+let current=null;const origin='http://127.0.0.1:18763';
+window.result={};window.testStart=mode=>{
+ if(current){current.bridge.close();current.frame.remove();}
+ const scope='sefa-'+crypto.randomUUID(),frame=document.createElement('iframe'),gate=new ProgressGate();
+ const result=window.result={ready:false,proof:false,accepted:0,rejected:0,queryCount:0,handshake:0,failed:false};
+ frame.src=origin+'/fixture.html?scope='+scope+'&mode='+mode;
+ document.body.append(frame);
+ const source=frame.contentWindow;
+ const bridge=new Bridge({source,scope,origin,send:(m,o)=>{if(m.method.endsWith('::isReady'))result.queryCount++;source.postMessage(JSON.stringify(m),o);},emit:d=>{
+ if(d.kind==='handshake')result.handshake++;
+ if(d.kind==='ready')result.ready=true;
+ if(d.kind==='ready-rejected'){result.failed=true;result.ready=false;result.proof=false;}
+ if(d.kind==='status-update'&&gate.sample(d,performance.now()))result.proof=true;
+ }});
+ current={bridge,frame,scope};frame.addEventListener('load',()=>bridge.ping());
+};
+window.addEventListener('message',e=>{if(current){if(current.bridge.receive(e))window.result.accepted++;else window.result.rejected++;}});
+window.injectWrong=()=>{const {scope}=current;window.postMessage(JSON.stringify({method:scope+'::ready',params:true}),location.origin);const other=document.createElement('iframe');other.src=origin+'/fixture.html?scope='+scope+'&mode=reply';document.body.append(other);};
+window.stopTest=()=>{if(current){current.bridge.close();current.frame.remove();current=null;}window.result.ready=false;window.result.proof=false;};
+</script></body></html>
