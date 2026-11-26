@@ -1,0 +1,32 @@
+name: SefaXTV 0.30 targeted dubbing voice and timing
+on:
+  push:
+    branches: ['lab/sefaxtv-pilot-v030']
+    paths: ['pilot030/**', '.github/workflows/pilot-030.yml']
+permissions:
+  contents: read
+jobs:
+  dubbing:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python pilot030/context.py && python pilot030/timing.py && python -m py_compile pilot030/test_dub.py
+      - run: sudo apt-get update && sudo apt-get install -y espeak-ng ffmpeg
+      - run: python -m pip install --index-url https://download.pytorch.org/whl/cpu torch==2.6.0
+      - run: python -m pip install -r pilot030/requirements.txt
+      - run: curl --fail --location --max-time 60 --max-filesize 5000000 'https://raw.githubusercontent.com/openai/whisper/86098128c0b4f24f0e2aa2994de830614b474227/tests/jfk.flac' -o pilot030/jfk.flac
+      - run: python pilot030/test_dub.py
+        env:
+          OMP_NUM_THREADS: '2'
+          MKL_NUM_THREADS: '2'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pilot030-listening-and-timing
+          path: pilot030-results/
+          if-no-files-found: ignore
+          retention-days: 7
