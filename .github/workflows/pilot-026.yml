@@ -1,0 +1,38 @@
+name: SefaXTV 0.26 actual live HLS frame verification
+on:
+  push:
+    branches: ['lab/sefaxtv-pilot-v026']
+    paths: ['pilot026/**', '.github/workflows/pilot-026.yml']
+permissions:
+  contents: read
+concurrency:
+  group: sefaxtv-external-single-probe
+  cancel-in-progress: false
+jobs:
+  live:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-save --package-lock=false hls.js@1.6.13 esbuild@0.25.5
+      - run: ./node_modules/.bin/esbuild pilot026/vendor-entry.mjs --bundle --platform=browser --format=esm --outfile=pilot026/vendor/hls.mjs
+      - run: node pilot026/test-frame-gate.mjs && node --check pilot026/live.mjs
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m py_compile pilot026/test_live.py
+      - run: python -m pip install playwright==1.52.0
+      - run: python -m playwright install --with-deps chromium
+      - run: |
+          if ! command -v google-chrome >/dev/null; then python -m playwright install chrome; fi
+      - run: python pilot026/test_live.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pilot026-live-evidence
+          path: pilot026-results/
+          if-no-files-found: ignore
+          retention-days: 7
