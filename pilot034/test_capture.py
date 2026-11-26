@@ -5,6 +5,12 @@ from pathlib import Path
 from playwright.sync_api import sync_playwright
 from local import Session,serve,assets
 out=Path("pilot034-results");out.mkdir(exist_ok=True)
+def wait_checked(page,expression,seconds):
+    deadline=time.monotonic()+seconds
+    while time.monotonic()<deadline:
+        if page.evaluate(expression):return
+        page.wait_for_timeout(100)
+    raise TimeoutError("Browser condition did not become true: "+expression)
 with tempfile.TemporaryDirectory() as td:
     s=Session(td,"football");assets(s)
     subprocess.run(["espeak-ng","-v","en-us","-s","150","-w",str(s.public/"fixture.wav"),"--stdin"],input="The goalkeeper saved the penalty in the final minute.",text=True,check=True)
@@ -31,10 +37,12 @@ with tempfile.TemporaryDirectory() as td:
             }""")
             print("RECORDER_RESULT",json.dumps(result),flush=True)
             assert len(result)==3 and all(x["size"]>1000 and x["gap"]<500 for x in result)
-            page.wait_for_function("!document.querySelector('#play').disabled",timeout=40000);page.click("#play")
+            (out/"capture.json").write_text(json.dumps(result,indent=2))
+            wait_checked(page,"()=>!document.querySelector('#play').disabled",40);page.click("#play")
             page.evaluate("""()=>{let v=document.querySelector('#v');window.framesSeen=0;function f(){window.framesSeen++;v.requestVideoFrameCallback(f)}v.requestVideoFrameCallback(f)}""")
-            page.wait_for_function("window.framesSeen>=80 && document.querySelector('#v').currentTime>3",timeout=30000)
+            wait_checked(page,"()=>window.framesSeen>=80 && document.querySelector('#v').currentTime>3 && !document.querySelector('#v').paused",30)
             assert s.done.wait(30)
+            assert s.status=="finished",s.status
             assert len(s.rows)==3 and sum(r["mode"]=="dub" for r in s.rows)>=2,s.rows
             report={"capture":result,"rows":[{k:v for k,v in r.items() if k!="translation"} for r in s.rows],"frames":page.evaluate("window.framesSeen"),"scope":"controlled MediaRecorder, not real TV tab permission"}
             (out/"summary.json").write_text(json.dumps(report,indent=2))
