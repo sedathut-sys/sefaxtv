@@ -41,10 +41,14 @@ Her işlemin sonunda yapılan geliştirmeyi, test sonuçlarını, kalite puanın
 
 | Bileşen | Durum | Kanıt |
 |---|---|---|
-| 0.26 gerçek TV test sayfası (Bir Gün TV) | Kullanıcı görüntü ve ses PASS | https://sedathut-sys.github.io/sefaxtv/live-tv-test/ ; kullanıcı bildirimi research/TEST_KULLANICI_026_GERCEK_TV.md (0.26 dalı) |
+| 0.26 gerçek TV (Bir Gün TV) | Kullanıcı görüntü ve ses PASS | https://sedathut-sys.github.io/sefaxtv/live-tv-test/ ; 0.26 dalı research/TEST_KULLANICI_026_GERCEK_TV.md |
 | 0.28 akıllı HLS izleyici | Otomatik PASS; ayrı geliştirme dalı | https://github.com/sedathut-sys/sefaxtv/actions/runs/45882873337 ; 30.2988 sn, 757 kare |
-| İngilizce ASR | Base.en geçici aday; 4 sentetik örnekte WER 0 | 0.28 aynı test; gerçek spiker doğruluğu henüz ölçülmedi |
-| Türkçe çeviri | Argos spor terimleri başarısız; 0.29 OPUS-MT ve M2M100 karşılaştırması hazırlanmış | lab/sefaxtv-pilot-v029, f881754576babc14fce28cc34fcd436568d64e73 |
-| Türkçe ses | eSpeak NG WAV üretimi doğrulandı; doğallık, canlı dublaj ve senkronizasyon doğrulanmadı | 0.27 ve 0.28 kayıtları |
+| 0.30 yerel dublaj motoru | 8/8 teknik eşikler PASS; 7 sentetik + 1 arşiv insan konuşması | https://github.com/sedathut-sys/sefaxtv/actions/runs/45885170590 ; Whisper Small.en, OPUS-MT, Piper Fahrettin; RTF .5015 |
+| 0.31 kontrollü gerçek zamanlı HLS dublaj | Otomatik PASS; 4/4 dublaj, kasıtlı gecikmede orijinal ses, 21.333 ms akış zaman damgası farkı | https://github.com/sedathut-sys/sefaxtv/actions/runs/45886230299 |
+| 0.32 harici kaynak | HTTP 404; canlı dublaj testi başlamadı | https://github.com/sedathut-sys/sefaxtv/actions/runs/45886717311 |
+| 0.33 yerel HLS paketi | Hedefli paket PASS; harici gerçek yayın doğrulanmadı | https://github.com/sedathut-sys/sefaxtv/actions/runs/45887331592 |
+| 0.34 izinli tarayıcı sekmesi yaklaşımı | Kod ve derleme kontrolleri PASS; bütünleşik test çalışıyor (son kontrol) | https://github.com/sedathut-sys/sefaxtv/actions/runs/45888214652 |
 
-Sıradaki iş: 0.29 çeviri sonuçlarını incele; kaliteye en fazla katkı sağlayan sonraki geliştirme paketini seç. Değişmeyen TV oynatıcıya gereksiz tekrar testi çalıştırma. Başarılı 0.26 kullanıcı test sayfasını ve ana uygulamayı koru. Doğal Türkçe dublaj ve gerçek zamanlama ölçümlerini kullanıcıya gösterilebilir bir aşamada birleştir. Kullanıcıya hazır olmayan sonucu başarılı diye sunma.
+0.30 ses doğallığı kullanıcı kabulü yok. 0.31 senkron altyapısı geçici 8/10; gerçek kullanıcı gecikmesi ve dudak senkronu ölçülmedi. 0.34 test kontrollü canvas/ses MediaStream üzerinden yapılır, gerçek ekran paylaşımı izin penceresi ve canlı TV ayrı kullanıcı testi gerektirir. 0.34 paket kalite puanı henüz ölçülmedi. Windows paketi Python 3.11 ve FFmpeg/ffprobe PATH gerektirir; ilk çalıştırmada model indirmeleri. Ana uygulama ve 0.26 kullanıcı sayfası değişmedi. Kırmızı Bülten yok.
+
+Sıradaki iş: 0.34 tamamlanmış CI sonucunu ve artifact varlığını kontrol et; bütünleşik test PASS ve paket mevcutsa kullanıcıya kısa, gerçek izinli İngilizce yayın sekmesi testi sun. FAIL ise yalnız ilgili arızayı gider. Önceki başarılı TV/ASR/TTS testlerini gereksiz yere tekrar etme.
