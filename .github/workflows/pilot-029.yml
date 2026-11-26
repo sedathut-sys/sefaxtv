@@ -1,0 +1,31 @@
+name: SefaXTV 0.29 translation model comparison
+on:
+  push:
+    branches: ['lab/sefaxtv-pilot-v029']
+    paths: ['pilot029/**', '.github/workflows/pilot-029.yml']
+permissions:
+  contents: read
+jobs:
+  dub:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: sudo apt-get update && sudo apt-get install -y espeak-ng
+      - run: python -m pip install --index-url https://download.pytorch.org/whl/cpu torch==2.6.0
+      - run: python -m pip install -r pilot029/dub/requirements.txt
+      - run: python -m py_compile pilot029/dub/engine.py pilot029/dub/compare.py
+      - run: python pilot029/dub/compare.py
+        env:
+          OMP_NUM_THREADS: '2'
+          MKL_NUM_THREADS: '2'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pilot029-dub-evidence
+          path: pilot029-dub-results/
+          if-no-files-found: ignore
+          retention-days: 7

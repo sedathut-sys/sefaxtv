@@ -1,0 +1,145 @@
+[
+  {
+    "en": "The football match starts at seven o'clock.",
+    "required": [
+      [
+        "futbol"
+      ],
+      [
+        "yedi",
+        "7"
+      ]
+    ],
+    "forbidden": []
+  },
+  {
+    "en": "The weather is cold today. Please close the window.",
+    "required": [
+      [
+        "soğuk"
+      ],
+      [
+        "pencere"
+      ]
+    ],
+    "forbidden": []
+  },
+  {
+    "en": "The goalkeeper saved the penalty in the final minute.",
+    "required": [
+      [
+        "kaleci"
+      ],
+      [
+        "penaltı"
+      ]
+    ],
+    "forbidden": [
+      "hedef muhafız"
+    ]
+  },
+  {
+    "en": "The home team won the match by two goals.",
+    "required": [
+      [
+        "ev sahibi"
+      ],
+      [
+        "iki",
+        "2"
+      ],
+      [
+        "gol"
+      ]
+    ],
+    "forbidden": [
+      "iki hedef"
+    ]
+  },
+  {
+    "en": "The player scored a goal just before halftime.",
+    "required": [
+      [
+        "gol"
+      ],
+      [
+        "devre",
+        "ilk yarı"
+      ]
+    ],
+    "forbidden": []
+  },
+  {
+    "en": "The referee showed a red card to the defender.",
+    "required": [
+      [
+        "hakem"
+      ],
+      [
+        "kırmızı kart"
+      ],
+      [
+        "savunma",
+        "defans"
+      ]
+    ],
+    "forbidden": []
+  },
+  {
+    "en": "Our goal is to reduce the cost of electricity.",
+    "required": [
+      [
+        "hedef",
+        "amaç"
+      ],
+      [
+        "elektrik"
+      ],
+      [
+        "maliyet",
+        "masraf",
+        "fiyat"
+      ]
+    ],
+    "forbidden": [
+      "gol"
+    ]
+  },
+  {
+    "en": "There is a penalty for late payment of the bill.",
+    "required": [
+      [
+        "ceza",
+        "gecikme faizi"
+      ],
+      [
+        "ödeme"
+      ],
+      [
+        "fatura"
+      ]
+    ],
+    "forbidden": [
+      "penaltı"
+    ]
+  },
+  {
+    "en": "The visiting team equalized in the second half.",
+    "required": [
+      [
+        "deplasman",
+        "konuk",
+        "misafir"
+      ],
+      [
+        "eşitle",
+        "beraberlik",
+        "eşitlik"
+      ],
+      [
+        "ikinci yarı"
+      ]
+    ],
+    "forbidden": []
+  }
+]
