@@ -1,7 +1,7 @@
 name: SefaXTV 0.23 single external bridge probe
 on:
   push:
-    branches: ['lab/sefaxtv-pilot-v022']
+    branches: ['lab/sefaxtv-pilot-v023']
     paths: ['pilot023/**', '.github/workflows/pilot-023.yml']
 permissions:
   contents: read
