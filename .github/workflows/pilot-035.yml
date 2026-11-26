@@ -1,0 +1,50 @@
+name: SefaXTV 0.35 Windows bootstrap and package
+on:
+  push:
+    branches: ['lab/sefaxtv-pilot-v035']
+    paths: ['pilot034/BASLAT.cmd', '.github/workflows/pilot-035.yml']
+permissions:
+  contents: read
+jobs:
+  windows-readiness:
+    runs-on: windows-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          architecture: x64
+      - shell: pwsh
+        run: |
+          if (-not (Get-Command ffmpeg -ErrorAction SilentlyContinue) -or -not (Get-Command ffprobe -ErrorAction SilentlyContinue)) {
+            choco install ffmpeg -y --no-progress
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
+      - shell: cmd
+        run: call pilot034\BASLAT.cmd --check-only
+  package:
+    needs: windows-readiness
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-save --package-lock=false hls.js@1.6.13 esbuild@0.25.5
+      - run: ./node_modules/.bin/esbuild pilot026/vendor-entry.mjs --bundle --platform=browser --format=esm --outfile=pilot034/hls.mjs
+      - run: |
+          mkdir -p pilot035-package/{pilot029/dub,pilot030,pilot032,pilot033,pilot034}
+          cp pilot029/dub/engine.py pilot035-package/pilot029/dub/
+          cp pilot030/{context.py,requirements.txt} pilot035-package/pilot030/
+          cp pilot032/live_worker.py pilot035-package/pilot032/
+          cp pilot033/{session.py,ingest.py} pilot035-package/pilot033/
+          cp pilot034/{local.py,index.html,app.mjs,capture.mjs,hls.mjs,BASLAT.cmd,README.md} pilot035-package/pilot034/
+          cp node_modules/hls.js/LICENSE pilot035-package/pilot034/HLS-LICENSE
+          cp pilot035/README.md pilot035-package/README.md
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pilot035-one-click-windows-user-test
+          path: pilot035-package/
+          retention-days: 14
