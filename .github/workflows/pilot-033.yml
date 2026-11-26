@@ -1,0 +1,35 @@
+name: SefaXTV 0.33 local live user prototype
+on:
+  push:
+    branches: ['lab/sefaxtv-pilot-v033']
+    paths: ['pilot033/**', '.github/workflows/pilot-033.yml']
+permissions:
+  contents: read
+jobs:
+  package:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m py_compile pilot033/*.py && python pilot033/test_local.py
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-save --package-lock=false hls.js@1.6.13 esbuild@0.25.5
+      - run: ./node_modules/.bin/esbuild pilot026/vendor-entry.mjs --bundle --platform=browser --format=esm --outfile=pilot033/hls.mjs
+      - run: node --check pilot033/viewer.mjs
+      - run: |
+          mkdir -p pilot033-package/pilot029/dub pilot033-package/pilot030 pilot033-package/pilot032 pilot033-package/pilot033
+          cp pilot029/dub/engine.py pilot033-package/pilot029/dub/
+          cp pilot030/context.py pilot030/requirements.txt pilot033-package/pilot030/
+          cp pilot032/live_worker.py pilot033-package/pilot032/
+          cp pilot033/{start.py,session.py,ingest.py,local_server.py,index.html,viewer.mjs,hls.mjs,README.md} pilot033-package/pilot033/
+          cp node_modules/hls.js/LICENSE pilot033-package/pilot033/HLS-LICENSE
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pilot033-local-source-package
+          path: pilot033-package/
+          retention-days: 7
