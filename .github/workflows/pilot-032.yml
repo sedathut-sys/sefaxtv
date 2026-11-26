@@ -1,0 +1,35 @@
+name: SefaXTV 0.32 official live input probe and bounded dubbing
+on:
+  push:
+    branches: ['lab/sefaxtv-pilot-v032']
+    paths: ['pilot032/**', '.github/workflows/pilot-032.yml']
+permissions:
+  contents: read
+concurrency:
+  group: sefaxtv-external-single-probe
+  cancel-in-progress: false
+jobs:
+  live-dub:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python pilot032/test_ingest.py && python -m py_compile pilot032/preflight.py pilot032/live_test.py pilot032/live_worker.py
+      - run: python pilot032/preflight.py
+      - run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - run: python -m pip install --index-url https://download.pytorch.org/whl/cpu torch==2.6.0
+      - run: python -m pip install -r pilot030/requirements.txt
+      - run: python pilot032/live_test.py
+        env:
+          OMP_NUM_THREADS: '2'
+          MKL_NUM_THREADS: '2'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pilot032-metadata-only
+          path: pilot032-evidence/
+          if-no-files-found: ignore
+          retention-days: 7
