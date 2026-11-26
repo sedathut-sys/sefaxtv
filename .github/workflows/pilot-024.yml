@@ -1,0 +1,40 @@
+name: SefaXTV 0.24 exact-origin JSChannel compatibility
+on:
+  push:
+    branches: ['lab/sefaxtv-pilot-v024']
+    paths: ['pilot024/**', '.github/workflows/pilot-024.yml']
+permissions:
+  contents: read
+concurrency:
+  group: sefaxtv-external-single-probe
+  cancel-in-progress: false
+jobs:
+  single:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-save --package-lock=false jschannel@1.0.2 esbuild@0.25.5
+      - run: ./node_modules/.bin/esbuild pilot024/vendor-entry.mjs --bundle --platform=browser --format=esm --outfile=pilot024/vendor/channel.mjs
+      - run: node --check pilot024/diagnostic.mjs && node --check pilot024/channel-adapter.mjs
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python pilot019/test_continuity.py
+      - run: python -m py_compile pilot024/test_local.py pilot024/test_external_once.py
+      - run: python -m pip install playwright==1.52.0
+      - run: python -m playwright install --with-deps chromium
+      - run: python pilot024/test_local.py
+      - run: |
+          if ! command -v google-chrome >/dev/null; then python -m playwright install chrome; fi
+      - run: python pilot024/test_external_once.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pilot024-single-evidence
+          path: pilot024-results/
+          if-no-files-found: ignore
+          retention-days: 7

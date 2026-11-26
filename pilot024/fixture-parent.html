@@ -1,0 +1,18 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Own parent</title></head><body><script type="module">
+import {openChannel} from './channel-adapter.mjs';
+import {ProgressGate} from './progress.mjs';
+let a=null;window.result={};
+window.startTest=()=>{
+ if(a){a.channel.close();a.frame.remove();}
+ const frame=document.createElement('iframe');frame.src='http://127.0.0.1:18763/fixture.html';document.body.append(frame);
+ const result=window.result={ready:false,proof:false,events:0};const gate=new ProgressGate();
+ const channel=openChannel({source:frame.contentWindow,origin:'http://127.0.0.1:18763',emit:d=>{
+  if(d.kind==='ready')result.ready=true;
+  if(d.kind==='status-update'){result.events++;if(gate.sample(d,performance.now()))result.proof=true;}
+ }});
+ a={frame,channel};
+};
+window.inject=()=>{window.postMessage(JSON.stringify({method:'peertube::ready',params:true}),location.origin);const other=document.createElement('iframe');other.src='http://127.0.0.1:18763/fixture.html';document.body.append(other);};
+window.rejected=()=>a.channel.rejected;
+window.stopTest=()=>{a.channel.close();a.frame.remove();window.result.ready=false;window.result.proof=false;};
+</script></body></html>
