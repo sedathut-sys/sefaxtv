@@ -1,0 +1,16 @@
+import assert from 'node:assert/strict';
+import {ProgressGate,classify} from './progress.mjs';
+const g=new ProgressGate(),s=(position,now,playbackState='playing')=>g.sample({position,playbackState},now);
+assert.equal(s(0,0),false);assert.equal(s(.5,500),false);assert.equal(s(1,1000),true);
+assert.equal(g.lastProof,1000);assert.equal(s(1,1500),false);assert.equal(g.lastProof,1000);
+assert.equal(s(9,2000),false);assert.equal(g.lastProof,null);
+assert.equal(s(9.5,2500),false);assert.equal(s(10,3000),true);
+assert.equal(s(10.5,3500,'paused'),false);assert.equal(g.lastProof,null);
+assert.equal(s(11,4000),false);assert.equal(s(11.5,4500),false);assert.equal(s(12,5000),true);
+assert.equal(s(12.5,9000),false);assert.equal(s(NaN,9500),false);assert.equal(g.lastProof,null);
+assert.equal(classify({ready:false,updates:0,playing:0,proof:false}),'ready-not-confirmed');
+assert.equal(classify({ready:true,updates:0,playing:0,proof:false}),'no-status-events');
+assert.equal(classify({ready:true,updates:3,playing:0,proof:false}),'no-playing-status');
+assert.equal(classify({ready:true,updates:3,playing:3,proof:false}),'no-sustained-progress');
+assert.equal(classify({ready:true,updates:3,playing:3,proof:true}),'provider-progress');
+console.log('PASS 23 diagnostic assertions');
