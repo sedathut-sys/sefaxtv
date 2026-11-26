@@ -1,0 +1,51 @@
+name: SefaXTV 0.34 browser capture dubbing integration
+on:
+  push:
+    branches: ['lab/sefaxtv-pilot-v034']
+    paths: ['pilot034/**', '.github/workflows/pilot-034.yml']
+permissions:
+  contents: read
+jobs:
+  integration:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: python -m py_compile pilot034/local.py pilot034/test_capture.py && node --check pilot034/capture.mjs && node --check pilot034/app.mjs
+      - run: npm install --no-save --package-lock=false hls.js@1.6.13 esbuild@0.25.5
+      - run: ./node_modules/.bin/esbuild pilot026/vendor-entry.mjs --bundle --platform=browser --format=esm --outfile=pilot034/hls.mjs
+      - run: sudo apt-get update && sudo apt-get install -y ffmpeg espeak-ng
+      - run: python -m pip install --index-url https://download.pytorch.org/whl/cpu torch==2.6.0
+      - run: python -m pip install -r pilot030/requirements.txt playwright==1.52.0
+      - run: |
+          if ! command -v google-chrome >/dev/null; then python -m playwright install --with-deps chrome; fi
+      - run: python pilot034/test_capture.py
+        env:
+          OMP_NUM_THREADS: '2'
+          MKL_NUM_THREADS: '2'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pilot034-controlled-evidence
+          path: pilot034-results/
+          if-no-files-found: ignore
+          retention-days: 7
+      - run: |
+          mkdir -p pilot034-package/{pilot029/dub,pilot030,pilot032,pilot033,pilot034}
+          cp pilot029/dub/engine.py pilot034-package/pilot029/dub/
+          cp pilot030/{context.py,requirements.txt} pilot034-package/pilot030/
+          cp pilot032/live_worker.py pilot034-package/pilot032/
+          cp pilot033/{session.py,ingest.py} pilot034-package/pilot033/
+          cp pilot034/{local.py,index.html,app.mjs,capture.mjs,hls.mjs,BASLAT.cmd,README.md} pilot034-package/pilot034/
+          cp node_modules/hls.js/LICENSE pilot034-package/pilot034/HLS-LICENSE
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pilot034-local-user-test
+          path: pilot034-package/
+          retention-days: 7
