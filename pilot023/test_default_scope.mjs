@@ -1,0 +1,18 @@
+import assert from 'node:assert/strict';
+import {Bridge,ORIGIN} from './bridge.mjs';
+const old={},fresh={},events=[],sent=[];
+const b=new Bridge({source:fresh,scope:'peertube',send:(m,o)=>sent.push([m,o]),emit:d=>events.push(d)});
+const e=(source,m,origin=ORIGIN)=>({source,origin,data:JSON.stringify(m)});
+const ping={method:'peertube::__ready',params:'ping'},ready={method:'peertube::ready',params:true};
+assert.equal(b.receive(e(old,ping)),false);
+assert.equal(b.receive(e(fresh,ping,'https://other.example')),false);
+assert.equal(b.receive(e(fresh,{...ping,method:'wrong::__ready'})),false);
+assert.equal(b.receive(e(fresh,ping)),true);
+assert.equal(b.receive(e(old,{id:1,result:true})),false);
+assert.equal(b.receive(e(old,ready)),false);
+assert.equal(b.receive(e(fresh,ready)),true);
+assert.equal(b.ready,true);
+assert.equal(sent.length,2);
+assert.ok(sent.every(x=>x[1]===ORIGIN));
+b.close();assert.equal(b.receive(e(fresh,ready)),false);
+console.log('PASS default scope still rejects old window and wrong origin');

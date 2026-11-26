@@ -1,0 +1,39 @@
+name: SefaXTV 0.23 single external bridge probe
+on:
+  push:
+    branches: ['lab/sefaxtv-pilot-v022']
+    paths: ['pilot023/**', '.github/workflows/pilot-023.yml']
+permissions:
+  contents: read
+concurrency:
+  group: sefaxtv-external-single-probe
+  cancel-in-progress: false
+jobs:
+  single:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node pilot021/test-bridge.mjs
+      - run: node pilot023/test_default_scope.mjs
+      - run: node --check pilot023/diagnostic.mjs
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python pilot019/test_continuity.py
+      - run: python -m py_compile pilot023/test_external_once.py
+      - run: python -m pip install playwright==1.52.0
+      - run: python -m playwright install --with-deps chromium
+      - run: |
+          if ! command -v google-chrome >/dev/null; then python -m playwright install chrome; fi
+      - run: python pilot023/test_external_once.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pilot023-single-evidence
+          path: pilot023-results/
+          if-no-files-found: ignore
+          retention-days: 7
